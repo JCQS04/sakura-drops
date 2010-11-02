@@ -1,0 +1,21 @@
+Overlapping
+    brighter points of intersection
+Sticking
+Bridging
+Generic
+    composed of gaps, usually thin and in semi-regular intervals
+    some have an inner ring, which is thinner, with wider gaps that match the locations of the parent
+    of varying thickness and size
+    those of semi-uniform sizes can form compound rings
+Astral
+    concentric structure, with defined center
+    orbiters as dots with a visible orbit
+    orbiters as pods attached on symmetric branches
+Symbol
+    inspired by japanese family crests
+Glowing
+
+Spinning
+Expanding
+Contracting
+Radiating

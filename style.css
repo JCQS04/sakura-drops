@@ -1,0 +1,49 @@
+/** START   base */
+
+* { margin: 0; padding: 0; border: 0; font: 12px/18px 'Consolas', monospace; }
+.button { overflow: visible; display: inline-block; line-height: 1; }
+.separator { text-indent: -9999em; overflow: hidden; display: block; }
+.toolbar { display: block; overflow: hidden; }
+.toolbar>.item { display: block; float: left; }
+
+/* END      base **/
+/** START   canvas app wrapper */
+
+html.canvas-app { background: #111; }
+.canvas-app body { margin: 0 auto; width: 800px; overflow: visible; 
+    position: static; }
+.canvas-app #the-canvas { width: inherit; height: 400px;
+    position: absolute; top: 50%; margin-top: -210px;
+    border: 1px solid rgba(255,255,255, .25);
+    box-shadow: 0 0 10px rgba(255,255,255, .5); 
+    -moz-box-shadow: 0 0 10px rgba(255,255,255, .5); 
+    -webkit-box-shadow: 0 0 10px rgba(255,255,255, .5); }
+
+/* END      canvas app wrapper **/
+/** START   canvas app button */
+
+.canvas-app .btn { padding: .5em 1em; border: 1px solid #444; border-radius: .3333em; 
+    color: #bbb; text-shadow: 0 -1px 1px #000; background-color: #000; 
+    background-image: -moz-linear-gradient(top, #444, #000); 
+    background-image: -webkit-gradient(linear,left top,left bottom,
+        color-stop(0,#444),color-stop(1,#000)); 
+    box-shadow: inset 0 0 .3333em rgba(0,0,0, .5); 
+    -moz-box-shadow: inset 0 0 .3333em rgba(0,0,0, .5); 
+    -webkit-box-shadow: inset 0 0 .3333em rgba(0,0,0, .5); }
+.canvas-app .btn:hover { color: #fff; border-color: #666; }
+.canvas-app .btn:active { background-image: -moz-linear-gradient(bottom, #222, #000); 
+    background-image: -webkit-gradient(linear,left bottom,left top,
+        color-stop(0,#222),color-stop(1,#000)); }
+
+/* END      canvas app button **/
+/** START   canvas app toolbar */
+
+.canvas-app .toolbar { padding: 7px; background: #111; 
+    background: rgba(255,255,255, .1); border-bottom-left-radius: 7px; 
+    border-bottom-right-radius: 7px; border: 1px solid rgba(255,255,255, .1); 
+    border-top: 0; }
+.canvas-app .toolbar>.btn-wrap.item { margin-right: 5px; }
+.canvas-app .toolbar>.separator.item { margin-left: 2px; margin-right: 7px; 
+    width: 0; height: 20px; padding: .5em 0; border-left: 1px dotted #444; }
+
+/* END      canvas app toolbar **/

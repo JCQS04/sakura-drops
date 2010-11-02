@@ -1,0 +1,76 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * This library follows the &lt;a href="http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml#show_hide_all_button">
+<span class='line'>  3</span>  *      Google JavaScript style guide&lt;/a>, but uses all of the current JsDoc tags as needed.&lt;br/>
+<span class='line'>  4</span>  *      Only common abbreviation patterns are used in names when appropriate:
+<span class='line'>  5</span>  *      &lt;code>pos:position, cb:callback, ns:namespace, init:initialize, args:arguments, 
+<span class='line'>  6</span>  *      i/idx:index, l/len:length, vm: viewModel, v:view, b:boundary, k:key, 
+<span class='line'>  7</span>  *      v/val:value, anim:animation, rad:radius, num:count, mag:magnitude,
+<span class='line'>  8</span>  *      d:delta, t:theta, dir:direction, util:utility, M:Math, C:constants, 
+<span class='line'>  9</span>  *      opt:options, params:parameters&lt;/code>.&lt;br/>
+<span class='line'> 10</span>  *      Encapsulation convention is &lt;code>publicMethod&lt;/code> and &lt;code>_protectedMethod&lt;/code>.&lt;br/>
+<span class='line'> 11</span>  *      Delegation convention is &lt;code>onDoSomething&lt;/code>, &lt;code>willDoSomething&lt;/code>, 
+<span class='line'> 12</span>  *      &lt;code>didDoSomething&lt;/code> and &lt;code>actionSocket&lt;/code>.&lt;br/>
+<span class='line'> 13</span>  * @author peng@pengxwang.com (Peng Wang)
+<span class='line'> 14</span>  * @name hlf
+<span class='line'> 15</span>  * @namespace Main namespace. Shorthand alternative to &lt;code>com.pengxwang&lt;/code>.
+<span class='line'> 16</span>  */</span><span class="WHIT">
+<span class='line'> 17</span> </span><span class="COMM">/** @name window */</span><span class="WHIT">
+<span class='line'> 18</span> </span><span class="COMM">/** Shorthand for app package namespace. */</span><span class="WHIT">
+<span class='line'> 19</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pkg</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'hlf.'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 20</span> </span><span class="COMM">/** @exports com.pengxwang as hlf */</span><span class="WHIT">
+<span class='line'> 21</span> </span><span class="COMM">// pkg = 'com.pengxwang.'; // use if really necessary</span><span class="WHIT">
+<span class='line'> 22</span> </span><span class="COMM">/**
+<span class='line'> 23</span>  * Utility methods, mixins, and classes. Categories include console, 
+<span class='line'> 24</span>  *      core, geom, math, etc.
+<span class='line'> 25</span>  * @name hlf.util
+<span class='line'> 26</span>  * @namespace 
+<span class='line'> 27</span>  */</span><span class="WHIT">
+<span class='line'> 28</span> </span><span class="COMM">/**
+<span class='line'> 29</span>  * @name hlf.module
+<span class='line'> 30</span>  * @namespace Module classes and mixins.
+<span class='line'> 31</span>  */</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="COMM">/**
+<span class='line'> 33</span>  * @name hlf.jquery
+<span class='line'> 34</span>  * @namespace Custom jQuery events and data.
+<span class='line'> 35</span>  */</span><span class="WHIT">
+<span class='line'> 36</span> </span><span class="COMM">/**
+<span class='line'> 37</span>  * @name Namespace
+<span class='line'> 38</span>  * @namespace Tool to allow namespacing. Comes with some extra bells and whistles.
+<span class='line'> 39</span>  *      &lt;a href="http://github.com/smith/namespacedotjs/">github&lt;/a>
+<span class='line'> 40</span>  */</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="COMM">/**
+<span class='line'> 42</span>  * @name Backbone
+<span class='line'> 43</span>  * @namespace Tool to control models and provide simple evented objects. 
+<span class='line'> 44</span>  *      &lt;a href="http://documentcloud.github.com/backbone/">github&lt;/a>
+<span class='line'> 45</span>  */</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="COMM">/**
+<span class='line'> 47</span>  * @name Backbone.Events
+<span class='line'> 48</span>  * @class Mixin to allow the observer pattern.
+<span class='line'> 49</span>  */</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="COMM">/**
+<span class='line'> 51</span>  * @name _
+<span class='line'> 52</span>  * @namespace UnderscoreJS. General tools, some of which are redundant. 
+<span class='line'> 53</span>  *      Required by {@link Backbone}. 
+<span class='line'> 54</span>  *      &lt;a href="http://documentcloud.github.com/underscore/">github&lt;/a>
+<span class='line'> 55</span>  */</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="COMM">/**
+<span class='line'> 57</span>  * @name jQuery
+<span class='line'> 58</span>  * @namespace jQuery factory, class, and namespace for static methods. It is
+<span class='line'> 59</span>  *      only documented here as static because it can't be documented as a class
+<span class='line'> 60</span>  *      and a namespace. &lt;a href="http://api.jquery.com/">api.jquery.com&lt;/a>
+<span class='line'> 61</span>  */</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="COMM">/**
+<span class='line'> 63</span>  * @name jQuery.fn
+<span class='line'> 64</span>  * @namespace General instance methods and namespace for custom plugins.
+<span class='line'> 65</span>  */</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="COMM">/**
+<span class='line'> 67</span>  * @name console
+<span class='line'> 68</span>  * @namespace Built-in debugger.
+<span class='line'> 69</span>  */</span></pre></body></html>
