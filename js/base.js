@@ -7,19 +7,21 @@
 // ----------------------------------------
 Namespace(pkg + 'sakuraDrops');
 Namespace.use(pkg + '*', function () {
-var app, C, M, canvas, context;
-var setScopeGlobals = function () {
-    if (canvas) {
-        return;
-    }
-    app = sakuraDrops;
-    C = app.constants;
-    M = app.Math;
-    canvas = app.canvas;
-    context = app.context;
-}; 
-setScopeGlobals();
-// A hack below calls above method a second time to get the updated canvas.
+var app = sakuraDrops, 
+    C = app.constants,
+    M = app.Math, 
+    canvas, context,
+    /** 
+     * A hack to update the scope globals for canvas when canvas is ready. 
+     *      This needs to be called in the constructor of every class and 
+     *      included in files needing the app's scope globals.
+     */
+    requireCanvasGlobals = function () {
+        if (!canvas) {
+            canvas = app.canvas;
+            context = canvas.context;
+        }  
+    };
 /**
  * @class Base functionality shared by all nodes in this app.
  * @augments hlf.util.BaseClass
@@ -85,7 +87,7 @@ app.BaseNode = util.Circle.extend(util.extend({
      * @see #didCreate
      */
     _construct: function (params) {
-        setScopeGlobals();
+        requireCanvasGlobals();
         this.pos = {};
         this.pos.x = util.toInt(params.pos.x) || canvas.getX();
         this.pos.y = util.toInt(params.pos.y) || canvas.getY();
@@ -212,28 +214,24 @@ app.BaseNode = util.Circle.extend(util.extend({
      */
     startSpin: function () {
         var _this = this,
-            d = new Date(),
-            t = d.getTime(),
-            time = 0, 
             beginning = this.ang,
             change = M.PI * util.simpleRandom(C.BASE_NODE.spinMin, C.BASE_NODE.spinMax),
             duration = C.BASE_NODE.spinSpeed,
-            callback = function () {
-                _this.update();
-                if (time >= duration) {
+            callback = function (elapsed, complete) {
+                if (complete) {
                     _this.sleep();
-                } else { // hack against infinite spin bug
-                    d = new Date();
-                    time = d.getTime() - t;
-                    _this.ang = _this.getSpinStep(time, beginning, change, duration);
+                } else {
+                    _this.update();
+                    _this.ang = _this.getSpinStep(elapsed, beginning, change, duration);
+                    _this.onSpin();
+                    _this.trigger('didAnimationStep');
+                    // console.log('animationStep');
                 }
-                _this.onSpin();
-                _this.trigger('didAnimationStep');
             };
         if (!this.spinAnimation) {
-            this.spinAnimation = canvas.animate(null, callback);
+            this.spinAnimation = canvas.animate(null, callback, duration);
         } else {
-            canvas.animate(null, callback, this.spinAnimation);
+            canvas.animate(null, callback, duration, this.spinAnimation);
         }
     },
     /**
@@ -260,6 +258,7 @@ app.BaseNode = util.Circle.extend(util.extend({
  * @property {Object} params Bin for storing all the manager settings.
  * @property {boolean} unitTest For testing, only run one node.
  * @property {int} iNodeWithFocus Index position of the focused node.
+ * @property {Object boolean} ready State flags useful for event handlers.
  * @param {!Object} params Settings as key-value pairs:
  *      <br/>num Required.
  *      <br/>unitTest Defaults to false.
@@ -271,17 +270,19 @@ app.BaseManager = util.BaseClass(util.extend(util.CanvasEventMixin, {
     params: undefined,
     unitTest: undefined,
     iNodeWithFocus: undefined,
+    ready: undefined,
     /**
      * @see #didCreate
      * @see #_populate
      */
     _construct: function (params) {
-        setScopeGlobals();
+        requireCanvasGlobals();
         this.params = params;
         this.$canvas = $(canvas.canvas);
         this.unitTest = params.unitTest || false;
         this._populate();
         this.bindMouse();
+        this.ready = {};
         this.didCreate();
     },
     // ----------------------------------------
@@ -362,10 +363,13 @@ app.BaseManager = util.BaseClass(util.extend(util.CanvasEventMixin, {
      * @todo Disabled sleep on focus out until slowSpin exists.
      */
     onMouseMove: function (evt) {
+        if (!this.ready.mouseMove) {
+            return;
+        }
         // console.log('onMouseMove');
+        var _this = this;
         for (var i = 0, l = this.nodes.length; i < l; i += 1) {
             if (this._contains(this.nodes[i], {x: evt.offsetX, y: evt.offsetY})) {
-                var node = this.nodes[i];
                 // on node i
                 if (i == this.iNodeWithFocus) {
                     // still on the same node
@@ -376,7 +380,11 @@ app.BaseManager = util.BaseClass(util.extend(util.CanvasEventMixin, {
                     this.iNodeWithFocus = undefined;
                 }
                 // moved from blank space
-                node.wake();
+                this.nodes[i].wake();
+                this.ready.mouseMove = false;
+                setTimeout(function () {
+                    _this.ready.mouseMove = true;
+                }, C.MOUSEMOVE_TIMEOUT)
                 this.iNodeWithFocus = i;
                 break;
             }

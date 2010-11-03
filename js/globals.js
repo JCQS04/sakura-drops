@@ -53,6 +53,7 @@ app.constants = {
     CIRCLE_PACKER: {
         passes: 35
     },
+    MOUSEMOVE_TIMEOUT: 200,
     /** @ignore */
     toString: function () {
         return pkg + 'sakuraDrops.constants';

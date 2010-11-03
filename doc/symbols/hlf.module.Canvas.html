@@ -9,20 +9,21 @@
 
 		<style type="text/css">
 			* { font-size: 11px; }
-html { background-color: #111; color: #ccc; font-family: 'Consolas', 'Anonymous', 
+html { background-color: #111; color: #aaa; font-family: 'Consolas', 'Anonymous', 
     'Anonymous Pro', 'Courier New', 'Menlo', monospace; }
 body { width: 900px; }
-a:link, a:hover, a:visited, a:active { color: #eee; text-decoration: none; 
-    border-bottom: 1px dotted #666}
+b, strong, a:link, a:hover, a:visited, a:active { color: #fff; background-color: #000; 
+    text-decoration: none; border-bottom: 1px dotted #666}
+a:hover { border-bottom: 1px solid #aaa; }
 .header { clear: both; background-color: #222; padding: 8px; }
 h1, h2, h3, .sectionTitle, caption { font-family: Georgia, serif; font-style: italic; 
-    font-weight: normal; color: #aaa; }
+    font-weight: normal; color: #909090; }
 .heading { font-style: italic; }
 h1 { font-size: 150%; padding: 0; margin: 1em 0 0 .3em; }
 hr { border: none 0; border-top: 1px dotted #444; height: 1px; }
-pre.code { display: block; padding: 8px; border: 1px dotted #444; color: lime; 
+pre.code { display: block; padding: 8px; border: 1px dotted #444; font-style: italic;
     background-color: #000; }
-code { color: lime; background-color: #000; }
+code { font-style: italic; background-color: #000; }
 #index { margin-top: 24px; float: left; width: 230px; position: absolute; 
     left: 8px; background-color: #222; padding: 8px; }
 #content { margin-left: 260px; width: 670px; }
@@ -331,7 +332,7 @@ ul.inheritsList { list-style: square; margin-left: 20px; padding-left: 0; }
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/hlf.module.Canvas.html#_startAnimation">_startAnimation</a></b>(anim, idx)
+								<div class="fixedFont"><b><a href="../symbols/hlf.module.Canvas.html#_startAnimation">_startAnimation</a></b>(anim, idx, duration)
 								</div>
 								<div class="description">Resets a timer, updates the index slot, and sets state to playing.</div>
 							</td>
@@ -349,7 +350,7 @@ ul.inheritsList { list-style: square; margin-left: 20px; padding-left: 0; }
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/hlf.module.Canvas.html#animate">animate</a></b>(opt, cb, idx)
+								<div class="fixedFont"><b><a href="../symbols/hlf.module.Canvas.html#animate">animate</a></b>(opt, cb, duration, idx)
 								</div>
 								<div class="description">Sets up an animation.</div>
 							</td>
@@ -478,6 +479,15 @@ ul.inheritsList { list-style: square; margin-left: 20px; padding-left: 0; }
 								<div class="fixedFont"><b><a href="../symbols/hlf.module.Canvas.html#line">line</a></b>(x1, y1, x2, y2)
 								</div>
 								<div class="description">Shortcut to drawing a straight line.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/hlf.module.Canvas.html#millis">millis</a></b>()
+								</div>
+								<div class="description">Simple way to get current time signature.</div>
 							</td>
 						</tr>
 					
@@ -907,7 +917,7 @@ ul.inheritsList { list-style: square; margin-left: 20px; padding-left: 0; }
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>_startAnimation</b>(anim, idx)
+					<b>_startAnimation</b>(anim, idx, duration)
 					
 					</div>
 					<div class="description">
@@ -933,6 +943,12 @@ ul.inheritsList { list-style: square; margin-left: 20px; padding-left: 0; }
 									
 								</dt>
 								<dd>Id of animation.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{?int=}</span> <b>duration</b>
+									
+								</dt>
+								<dd>Default is infinite.</dd>
 							
 							</dl>
 						
@@ -992,7 +1008,7 @@ ul.inheritsList { list-style: square; margin-left: 20px; padding-left: 0; }
 					<div class="fixedFont">
 					
 					<span class="light">{number}</span>
-					<b>animate</b>(opt, cb, idx)
+					<b>animate</b>(opt, cb, duration, idx)
 					
 					</div>
 					<div class="description">
@@ -1020,7 +1036,13 @@ ul.inheritsList { list-style: square; margin-left: 20px; padding-left: 0; }
 								<dd>Frame callback.</dd>
 							
 								<dt>
-									<span class="light fixedFont">{?number=}</span> <b>idx</b>
+									<span class="light fixedFont">{?int=}</span> <b>duration</b>
+									
+								</dt>
+								<dd>Default is infinite.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{?int=}</span> <b>idx</b>
 									
 								</dt>
 								<dd>Id of animation and timer. Always should be same.</dd>
@@ -1531,6 +1553,38 @@ ul.inheritsList { list-style: square; margin-left: 20px; padding-left: 0; }
 
 					<hr />
 				
+					<a name="millis"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{int}</span>
+					<b>millis</b>()
+					
+					</div>
+					<div class="description">
+						Simple way to get current time signature.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{int}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name="movePlotter"> </a>
 					<div class="fixedFont">
 					
@@ -1847,7 +1901,7 @@ ul.inheritsList { list-style: square; margin-left: 20px; padding-left: 0; }
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Nov 01 2010 04:28:11 GMT-0700 (PDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Nov 03 2010 02:29:51 GMT-0700 (PDT)
 		</div>
 	</body>
 </html>

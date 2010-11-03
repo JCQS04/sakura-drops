@@ -22,8 +22,7 @@ var app = sakuraDrops;
 // ----------------------------------------
 // APP GLOBALS
 // ----------------------------------------
-var canvas, context,
-    $stopper, $exporter, $toolbar;
+var $stopper, $exporter, $toolbar;
 /**
  * jQuery object resulting from the toolbar plugin. Has buttons including:
  *      #stop-animation and #export-canvas. Own id is #the-canvas-toolbar.
@@ -42,29 +41,30 @@ app.$toolbar = $toolbar;
  * @requires Utility library. {@link hlf.util }
  * @requires Module library. {@link hlf.module }
  * @requires jQuery library. {@link hlf.jquery }
+ * @property {hlf.sakuraDrops.dropManager} m
  */
 app.sketch1 = function () {
-    var m = this.m = app.DropManager.create({
+    this.m = app.DropManager.create({
         num: 10,
         unitTest: false
     });
     $toolbar.hideButton($stopper);
-    m.update();
+    this.m.update();
 };
 /** 
  * On load callback for the page.
  */
 jQuery(document).ready(function ($) {
     // set globals
-    canvas = app.canvas = module.Canvas.create('the-canvas');
-    context = app.context = canvas.context;
+    app.canvas = module.Canvas.create('the-canvas');
+    app.context = app.canvas.context;
     $stopper = $('#stop-animation').click(function (evt) {
-        canvas.togglePauseAndPlay();
+        app.canvas.togglePauseAndPlay();
         $stopper.text(($stopper.text === 'stop') ? 'play' : 'stop');
         evt.preventDefault();
     });
     $exporter = $('#export-canvas').click(function (evt) {
-        canvas.exportAsImage();
+        app.canvas.exportAsImage();
     });
     $toolbar = $('#the-canvas-toolbar').toolbar();
     // run

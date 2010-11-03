@@ -7,18 +7,16 @@
 // ----------------------------------------
 Namespace(pkg + 'sakuraDrops');
 Namespace.use(pkg + '*', function () {
-var app, C, M, canvas, context;
-var setScopeGlobals = function () {
-    if (canvas) {
-        return;
-    }
-    app = sakuraDrops;
-    C = app.constants.DROP_NODE;
-    M = app.Math;
-    canvas = app.canvas;
-    context = app.context;
-}; 
-setScopeGlobals();
+var app = sakuraDrops, 
+    C = app.constants.DROP_NODE, // custom
+    M = app.Math, 
+    canvas, context,
+    requireCanvasGlobals = function () {
+        if (!canvas) {
+            canvas = app.canvas;
+            context = canvas.context;
+        }  
+    };
 // ----------------------------------------
 // CLASS
 // ----------------------------------------
@@ -87,7 +85,7 @@ app.DropNode = app.BaseNode.extend({
      */
     didCreate: function () {
         // deviation from base rad
-        setScopeGlobals();
+        requireCanvasGlobals();
         var d = M.sqrt(C.radWithInnerRing / this.rad),
             r = util.simpleRandom(-1, 1) * C.innerBuffer,
             dir = canvas.getAngDir(),

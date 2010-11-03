@@ -7,18 +7,16 @@
 // ----------------------------------------
 Namespace(pkg + 'sakuraDrops');
 Namespace.use(pkg + '*', function () {
-var app, C, M, canvas, context;
-var setScopeGlobals = function () {
-    if (canvas) {
-        return;
-    }
-    app = sakuraDrops;
-    C = app.constants;
-    M = app.Math;
-    canvas = app.canvas;
-    context = app.context;
-}; 
-setScopeGlobals();
+var app = sakuraDrops, 
+    C = app.constants,
+    M = app.Math, 
+    canvas, context,
+    requireCanvasGlobals = function () {
+        if (!canvas) {
+            canvas = app.canvas;
+            context = canvas.context;
+        }  
+    };
 // ----------------------------------------
 // CLASS
 // ----------------------------------------
@@ -57,7 +55,7 @@ app.DropManager = app.BaseManager.extend({
      * @see hlf.util.curvingBufferedRandom
      */
     onPopulate: function (i) {
-        setScopeGlobals();
+        requireCanvasGlobals();
         var x = util.simpleRandom(canvas.getWidth()),
             y = util.simpleRandom(canvas.getHeight()),
             rad = util.curvingBufferedRandom(C.DROP_NODE.rad, .5, 2),
@@ -84,6 +82,9 @@ app.DropManager = app.BaseManager.extend({
         this.cp.bind('drawingSocket', function () {
             canvas.background('rgb(0,0,0)');
             _this.draw();
+        });
+        this.cp.bind('didSettle', function () {
+            _this.ready.mouseMove = true;
         });
     },
     /** Runs / refreshes the circle packer. */

@@ -8,76 +8,73 @@
 	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
 <span class='line'>  2</span>  * @fileoverview Inspired by the effects in Sakura Drops.
 <span class='line'>  3</span>  * @author peng@pengxwang.com (Peng Wang)
-<span class='line'>  4</span>  * @requires jQuery
-<span class='line'>  5</span>  * @requires Namespace
-<span class='line'>  6</span>  */</span><span class="WHIT">
-<span class='line'>  7</span> </span><span class="COMM">// TODO - require js sometimes doesn't work</span><span class="WHIT">
-<span class='line'>  8</span> </span><span class="COMM">// if (window.require && </span><span class="WHIT">
-<span class='line'>  9</span> </span><span class="COMM">//     !window.jQuery || </span><span class="WHIT">
-<span class='line'> 10</span> </span><span class="COMM">//     !window.Namespace || </span><span class="WHIT">
-<span class='line'> 11</span> </span><span class="COMM">//     !window.hlf.util || </span><span class="WHIT">
-<span class='line'> 12</span> </span><span class="COMM">//     !window.hlf.module</span><span class="WHIT">
-<span class='line'> 13</span> </span><span class="COMM">//     ) {</span><span class="WHIT">
-<span class='line'> 14</span> </span><span class="COMM">//     window.location.reload();</span><span class="WHIT">
-<span class='line'> 15</span> </span><span class="COMM">// }</span><span class="WHIT">
-<span class='line'> 16</span> </span><span class="COMM">/**
-<span class='line'> 17</span>  * @name hlf.sakuraDrops
-<span class='line'> 18</span>  * @namespace Application namespace.
-<span class='line'> 19</span>  */</span><span class="WHIT">
-<span class='line'> 20</span> </span><span class="COMM">/** @exports app as hlf.sakuraDrops */</span><span class="WHIT">
-<span class='line'> 21</span> </span><span class="NAME">Namespace</span><span class="PUNC">(</span><span class="NAME">pkg</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'sakuraDrops'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 22</span> </span><span class="NAME">Namespace.use</span><span class="PUNC">(</span><span class="NAME">pkg</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'*'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 23</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">app</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 24</span> </span><span class="WHIT">    </span><span class="NAME">app</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">sakuraDrops</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 25</span> </span><span class="COMM">// ----------------------------------------</span><span class="WHIT">
-<span class='line'> 26</span> </span><span class="COMM">// APP GLOBALS</span><span class="WHIT">
-<span class='line'> 27</span> </span><span class="COMM">// ----------------------------------------</span><span class="WHIT">
-<span class='line'> 28</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">canvas</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">context</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 29</span> </span><span class="WHIT">    </span><span class="NAME">$stopper</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">$exporter</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">$toolbar</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 30</span> </span><span class="COMM">/**
-<span class='line'> 31</span>  * jQuery object resulting from the toolbar plugin. Has buttons including:
-<span class='line'> 32</span>  *      #stop-animation and #export-canvas. Own id is #the-canvas-toolbar.
-<span class='line'> 33</span>  * @requires jQuery.fn.toolbar
-<span class='line'> 34</span>  * @type {jQuery}
-<span class='line'> 35</span>  */</span><span class="WHIT">
-<span class='line'> 36</span> </span><span class="NAME">app.$toolbar</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">$toolbar</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 37</span> </span><span class="COMM">// ----------------------------------------</span><span class="WHIT">
-<span class='line'> 38</span> </span><span class="COMM">// APP PROCEDURES</span><span class="WHIT">
-<span class='line'> 39</span> </span><span class="COMM">// ----------------------------------------</span><span class="WHIT">
-<span class='line'> 40</span> </span><span class="COMM">/**
-<span class='line'> 41</span>  * App procedure #1
-<span class='line'> 42</span>  * @requires NamespaceJS. {@link Namespace}
-<span class='line'> 43</span>  * @requires UnderscoreJS. {@link _}
-<span class='line'> 44</span>  * @requires BackboneJS. {@link Backbone}
-<span class='line'> 45</span>  * @requires Utility library. {@link hlf.util }
-<span class='line'> 46</span>  * @requires Module library. {@link hlf.module }
-<span class='line'> 47</span>  * @requires jQuery library. {@link hlf.jquery }
-<span class='line'> 48</span>  */</span><span class="WHIT">
-<span class='line'> 49</span> </span><span class="NAME">app.sketch1</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 50</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">m</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.m</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">app.DropManager.create</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 51</span> </span><span class="WHIT">        </span><span class="NAME">num</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 52</span> </span><span class="WHIT">        </span><span class="NAME">unitTest</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="WHIT">
-<span class='line'> 53</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 54</span> </span><span class="WHIT">    </span><span class="NAME">$toolbar.hideButton</span><span class="PUNC">(</span><span class="NAME">$stopper</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 55</span> </span><span class="WHIT">    </span><span class="NAME">m.update</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 56</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 57</span> </span><span class="COMM">/** 
-<span class='line'> 58</span>  * On load callback for the page.
-<span class='line'> 59</span>  */</span><span class="WHIT">
-<span class='line'> 60</span> </span><span class="NAME">jQuery</span><span class="PUNC">(</span><span class="NAME">document</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">ready</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">$</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 61</span> </span><span class="WHIT">    </span><span class="COMM">// set globals</span><span class="WHIT">
-<span class='line'> 62</span> </span><span class="WHIT">    </span><span class="NAME">canvas</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">app.canvas</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">module.Canvas.create</span><span class="PUNC">(</span><span class="STRN">'the-canvas'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 63</span> </span><span class="WHIT">    </span><span class="NAME">context</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">app.context</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">canvas.context</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="NAME">$stopper</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">$</span><span class="PUNC">(</span><span class="STRN">'#stop-animation'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">click</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">evt</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 65</span> </span><span class="WHIT">        </span><span class="NAME">canvas.togglePauseAndPlay</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 66</span> </span><span class="WHIT">        </span><span class="NAME">$stopper.text</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">$stopper.text</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">'stop'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="STRN">'play'</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'stop'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 67</span> </span><span class="WHIT">        </span><span class="NAME">evt.preventDefault</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  4</span>  */</span><span class="WHIT">
+<span class='line'>  5</span> </span><span class="COMM">// TODO - require js sometimes doesn't work</span><span class="WHIT">
+<span class='line'>  6</span> </span><span class="COMM">// if (window.require && </span><span class="WHIT">
+<span class='line'>  7</span> </span><span class="COMM">//     !window.jQuery || </span><span class="WHIT">
+<span class='line'>  8</span> </span><span class="COMM">//     !window.Namespace || </span><span class="WHIT">
+<span class='line'>  9</span> </span><span class="COMM">//     !window.hlf.util || </span><span class="WHIT">
+<span class='line'> 10</span> </span><span class="COMM">//     !window.hlf.module</span><span class="WHIT">
+<span class='line'> 11</span> </span><span class="COMM">//     ) {</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="COMM">//     window.location.reload();</span><span class="WHIT">
+<span class='line'> 13</span> </span><span class="COMM">// }</span><span class="WHIT">
+<span class='line'> 14</span> </span><span class="COMM">/**
+<span class='line'> 15</span>  * @name hlf.sakuraDrops
+<span class='line'> 16</span>  * @namespace Application namespace.
+<span class='line'> 17</span>  */</span><span class="WHIT">
+<span class='line'> 18</span> </span><span class="COMM">/** @exports app as hlf.sakuraDrops */</span><span class="WHIT">
+<span class='line'> 19</span> </span><span class="NAME">Namespace</span><span class="PUNC">(</span><span class="NAME">pkg</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'sakuraDrops'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 20</span> </span><span class="NAME">Namespace.use</span><span class="PUNC">(</span><span class="NAME">pkg</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'*'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 21</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">app</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">sakuraDrops</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 22</span> </span><span class="COMM">// ----------------------------------------</span><span class="WHIT">
+<span class='line'> 23</span> </span><span class="COMM">// APP GLOBALS</span><span class="WHIT">
+<span class='line'> 24</span> </span><span class="COMM">// ----------------------------------------</span><span class="WHIT">
+<span class='line'> 25</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">$stopper</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">$exporter</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">$toolbar</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 26</span> </span><span class="COMM">/**
+<span class='line'> 27</span>  * jQuery object resulting from the toolbar plugin. Has buttons including:
+<span class='line'> 28</span>  *      #stop-animation and #export-canvas. Own id is #the-canvas-toolbar.
+<span class='line'> 29</span>  * @requires jQuery.fn.toolbar
+<span class='line'> 30</span>  * @type {jQuery}
+<span class='line'> 31</span>  */</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="NAME">app.$toolbar</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">$toolbar</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="COMM">// ----------------------------------------</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="COMM">// APP PROCEDURES</span><span class="WHIT">
+<span class='line'> 35</span> </span><span class="COMM">// ----------------------------------------</span><span class="WHIT">
+<span class='line'> 36</span> </span><span class="COMM">/**
+<span class='line'> 37</span>  * App procedure #1
+<span class='line'> 38</span>  * @requires NamespaceJS. {@link Namespace}
+<span class='line'> 39</span>  * @requires UnderscoreJS. {@link _}
+<span class='line'> 40</span>  * @requires BackboneJS. {@link Backbone}
+<span class='line'> 41</span>  * @requires Utility library. {@link hlf.util }
+<span class='line'> 42</span>  * @requires Module library. {@link hlf.module }
+<span class='line'> 43</span>  * @requires jQuery library. {@link hlf.jquery }
+<span class='line'> 44</span>  * @property {hlf.sakuraDrops.dropManager} m
+<span class='line'> 45</span>  */</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="NAME">app.sketch1</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">    </span><span class="NAME">this.m</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">app.DropManager.create</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="WHIT">        </span><span class="NAME">num</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">10</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 49</span> </span><span class="WHIT">        </span><span class="NAME">unitTest</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">    </span><span class="NAME">$toolbar.hideButton</span><span class="PUNC">(</span><span class="NAME">$stopper</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="WHIT">    </span><span class="NAME">this.m.update</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 53</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 54</span> </span><span class="COMM">/** 
+<span class='line'> 55</span>  * On load callback for the page.
+<span class='line'> 56</span>  */</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="NAME">jQuery</span><span class="PUNC">(</span><span class="NAME">document</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">ready</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">$</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT">    </span><span class="COMM">// set globals</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">    </span><span class="NAME">app.canvas</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">module.Canvas.create</span><span class="PUNC">(</span><span class="STRN">'the-canvas'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">    </span><span class="NAME">app.context</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">app.canvas.context</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">    </span><span class="NAME">$stopper</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">$</span><span class="PUNC">(</span><span class="STRN">'#stop-animation'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">click</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">evt</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="WHIT">        </span><span class="NAME">app.canvas.togglePauseAndPlay</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">        </span><span class="NAME">$stopper.text</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">$stopper.text</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">'stop'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="STRN">'play'</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'stop'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">        </span><span class="NAME">evt.preventDefault</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="NAME">$exporter</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">$</span><span class="PUNC">(</span><span class="STRN">'#export-canvas'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">click</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">evt</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">        </span><span class="NAME">app.canvas.exportAsImage</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 68</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 69</span> </span><span class="WHIT">    </span><span class="NAME">$exporter</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">$</span><span class="PUNC">(</span><span class="STRN">'#export-canvas'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">click</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">evt</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 70</span> </span><span class="WHIT">        </span><span class="NAME">canvas.exportAsImage</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 72</span> </span><span class="WHIT">    </span><span class="NAME">$toolbar</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">$</span><span class="PUNC">(</span><span class="STRN">'#the-canvas-toolbar'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">toolbar</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 73</span> </span><span class="WHIT">    </span><span class="COMM">// run</span><span class="WHIT">
-<span class='line'> 74</span> </span><span class="WHIT">    </span><span class="NAME">app.sketch1</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 75</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// ready</span><span class="WHIT">
-<span class='line'> 76</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// namespace</span></pre></body></html>
+<span class='line'> 69</span> </span><span class="WHIT">    </span><span class="NAME">$toolbar</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">$</span><span class="PUNC">(</span><span class="STRN">'#the-canvas-toolbar'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">toolbar</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">    </span><span class="COMM">// run</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="NAME">app.sketch1</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// ready</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// namespace</span></pre></body></html>
