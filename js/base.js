@@ -257,7 +257,6 @@ app.BaseNode = util.Circle.extend(util.extend({
  * @property {Array hlf.sakuraDrops.BaseNode} nodes Index of all nodes.
  * @property {Object} params Bin for storing all the manager settings.
  * @property {boolean} unitTest For testing, only run one node.
- * @property {int} iNodeWithFocus Index position of the focused node.
  * @property {Object boolean} ready State flags useful for event handlers.
  * @param {!Object} params Settings as key-value pairs:
  *      <br/>num Required.
@@ -269,7 +268,6 @@ app.BaseManager = util.BaseClass(util.extend(util.CanvasEventMixin, {
     nodes: undefined,
     params: undefined,
     unitTest: undefined,
-    iNodeWithFocus: undefined,
     ready: undefined,
     /**
      * @see #didCreate
@@ -370,22 +368,12 @@ app.BaseManager = util.BaseClass(util.extend(util.CanvasEventMixin, {
         var _this = this;
         for (var i = 0, l = this.nodes.length; i < l; i += 1) {
             if (this._contains(this.nodes[i], {x: evt.offsetX, y: evt.offsetY})) {
-                // on node i
-                if (i == this.iNodeWithFocus) {
-                    // still on the same node
-                    break;
-                } else if (this.iNodeWithFocus) {
-                    // moved from another node
-                    // this.nodes[this.iNodeWithFocus].sleep();
-                    this.iNodeWithFocus = undefined;
-                }
                 // moved from blank space
                 this.nodes[i].wake();
                 this.ready.mouseMove = false;
                 setTimeout(function () {
                     _this.ready.mouseMove = true;
                 }, C.MOUSEMOVE_TIMEOUT)
-                this.iNodeWithFocus = i;
                 break;
             }
         }
