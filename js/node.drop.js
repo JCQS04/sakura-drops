@@ -20,6 +20,7 @@ var app = sakuraDrops,
 // ----------------------------------------
 // CLASS
 // ----------------------------------------
+// TODO
 /**
  * @class The most common type of nodes. Each node can have segmented inner and 
  *      outer arcs, though the visual results vary based on chance and parameterization. 
@@ -52,7 +53,8 @@ app.DropNode = app.BaseNode.extend({
     innerRing: undefined,
     outerSegments: undefined,
     innerSegments: undefined,
-    radStatic: undefined,
+    radFinal: undefined,
+    introAnimation: undefined,
     // ----------------------------------------
     // ACCESSORS
     // ----------------------------------------
@@ -63,7 +65,7 @@ app.DropNode = app.BaseNode.extend({
      */
     hasInnerRing: function () {
         return this.innerRing || (this.getArcLen() > M.PI && 
-            this.rad > C.radWithInnerRing);
+            this.radFinal > C.radWithInnerRing);
     },
     hasOuterSegments: function () {
         return this.outerSegments || this.luck <= C.outerSegmentsChance;
@@ -76,6 +78,7 @@ app.DropNode = app.BaseNode.extend({
     // ----------------------------------------
     // SETUP
     // ----------------------------------------
+    // TODO
     /**
      * Setup for the custom node traits. Parameters are built through chance and 
      *      parameterization. 
@@ -91,12 +94,12 @@ app.DropNode = app.BaseNode.extend({
             r = util.simpleRandom(-1, 1) * C.innerBuffer,
             dir = canvas.getAngDir(),
             _this = this;
-        this.radStatic = this.rad;
+        this.radFinal = this.rad;
         this.rad = 0;
         if (this.hasInnerRing()) {
             this.innerRing = {
-                rad: 0,
-                radStatic: _this.rad * C.innerRad * d,
+                rad: undefined,
+                radRatio: C.innerRad * d,
                 lineWidth: M.sqrt(_this.lineWidth) * C.innerLineWidth * d,
                 angStart: _this.angStart - d + r * M.QTR_PI * dir, 
                 angEnd: _this.angEnd + d + r * M.QTR_PI * dir,
@@ -106,6 +109,7 @@ app.DropNode = app.BaseNode.extend({
             };
         }
         this._generateSegments();
+        this._introAnimation();
     },
     /**
      * Super method for generating arc segment data for both outer and inner
@@ -184,11 +188,26 @@ app.DropNode = app.BaseNode.extend({
             // console.logAtPos('innerSegments', this); 
         }
     },
-    // ----------------------------------------
-    // UPDATE
-    // ----------------------------------------
-    didUpdate: function () {
-        if (this.rad)
+    /**
+     * TODO
+     */
+    _introAnimation: function () {
+        var _this = this,
+            beginning = this.rad,
+            change = this.radFinal - this.rad,
+            duration = C.introSpeed,
+            callback = function (elapsed, complete) {
+                    debugger;
+                if (!complete) {
+                    debugger;
+                    _this.rad = util.easeInOutCubic(elapsed, beginning, change, duration);
+                    if (_this.hasInnerRing()) {
+                        _this.innerRing.rad = _this.rad * _this.innerRing.radRatio;
+                    }
+                    _this.trigger('didAnimationStep');
+                }
+            };
+        this.introAnimation = canvas.animate(null, callback, duration);
     },
     // ----------------------------------------
     // DRAW

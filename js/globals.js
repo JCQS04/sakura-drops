@@ -45,6 +45,7 @@ app.constants = {
         innerSegmentBreak: 1 / 6,
         segmentFluxMin: 1 / 2,
         segmentFluxMax: 3 / 2,
+        introSpeed: 500
     },
     /** 
      * Constants: passes.

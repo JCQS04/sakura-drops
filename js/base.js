@@ -58,20 +58,6 @@ app.BaseNode = util.Circle.extend(util.extend({
     // ACCESSORS
     // ----------------------------------------
     /**
-     * Uses the ease-in-out-cubic easing equation to get the d(change in value).
-     * @param {!int} t Current time, in millis.
-     * @param {!number} b Beginning value.
-     * @param {!number} c Overall change in value.
-     * @param {!int} d Duration, in millis.
-     * @return {number} Size of current step.
-     */
-    getSpinStep: function (t, b, c, d) {
-        if ((t /= d / 2) < 1) {
-            return c / 2 * t * t * t + b;
-        }
-		return c / 2 * ((t -= 2) * t * t + 2) + b;
-    },
-    /**
      * Accessor.
      * @return {number}
      */
@@ -100,7 +86,6 @@ app.BaseNode = util.Circle.extend(util.extend({
         this.angEnd = params.angEnd || PI * 2;
         this.inBounds = params.inBounds || false;
         this.isAwake = false;
-        this.update();
         this.didCreate();
     },
     // ----------------------------------------
@@ -110,7 +95,6 @@ app.BaseNode = util.Circle.extend(util.extend({
        Delegate method container; extend and fill as needed.
     */
     didCreate: function () {},
-    didUpdate: function () {},
     didWake: function () {},
     didSleep: function () {},
     onDraw: function () {},
@@ -118,21 +102,10 @@ app.BaseNode = util.Circle.extend(util.extend({
     onSpin: function () {},
     /**#@-*/
     // ----------------------------------------
-    // UPDATE BASE NODE
+    // HELPERS
     // ----------------------------------------
-    /**
-     * Updating API. Updates the node in the context of its surroundings.
-     * @see #_stayInBounds
-     * @see #didUpdate
-     */ 
-    update: function () {
-        if (this.inBounds) {
-            this._stayInBounds();
-        }
-        this.didUpdate();
-    },
     /** Stay within the canvas, adjusted for radius and stroke. */
-    _stayInBounds: function () {
+    stayInBounds: function () {
         var d = this.rad + this.lineWidth * 3;
         this.pos.x = util.toInt(util.constrain(this.pos.x, d, canvas.getWidth() - d));
         this.pos.y = util.toInt(util.constrain(this.pos.y, d, canvas.getHeight() - d));
@@ -221,8 +194,7 @@ app.BaseNode = util.Circle.extend(util.extend({
                 if (complete) {
                     _this.sleep();
                 } else {
-                    _this.update();
-                    _this.ang = _this.getSpinStep(elapsed, beginning, change, duration);
+                    _this.ang = util.easeInOutCubic(elapsed, beginning, change, duration);
                     _this.onSpin();
                     _this.trigger('didAnimationStep');
                     // console.log('animationStep');
@@ -373,7 +345,7 @@ app.BaseManager = util.BaseClass(util.extend(util.CanvasEventMixin, {
                 this.ready.mouseMove = false;
                 setTimeout(function () {
                     _this.ready.mouseMove = true;
-                }, C.MOUSEMOVE_TIMEOUT)
+                }, C.MOUSEMOVE_TIMEOUT);
                 break;
             }
         }
