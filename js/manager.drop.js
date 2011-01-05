@@ -5,8 +5,8 @@
 // ----------------------------------------
 // OVERHEAD
 // ----------------------------------------
-Namespace(pkg + 'sakuraDrops');
-Namespace.use(pkg + '*', function () {
+_.namespace(pkg + 'sakuraDrops');
+_.using(pkg + '*', function () {
 var app = sakuraDrops, 
     C = app.constants,
     M = app.Math, 

@@ -3,8 +3,8 @@
  * @author peng@pengxwang.com (Peng Wang)
  */
 /** @exports app as hlf.sakuraDrops */
-Namespace(pkg + 'sakuraDrops');
-Namespace.use(pkg + '*', function () {
+_.namespace(pkg + 'sakuraDrops');
+_.using(pkg + '*', function () {
 var app = sakuraDrops;
 /** @namespace Group of all app constants. Each property is a set of class constants. */
 app.constants = {

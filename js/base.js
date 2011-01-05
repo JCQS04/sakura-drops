@@ -5,8 +5,8 @@
 // ----------------------------------------
 // OVERHEAD
 // ----------------------------------------
-Namespace(pkg + 'sakuraDrops');
-Namespace.use(pkg + '*', function () {
+_.namespace(pkg + 'sakuraDrops');
+_.using(pkg + '*', function () {
 var app = sakuraDrops, 
     C = app.constants,
     M = app.Math, 
@@ -24,7 +24,7 @@ var app = sakuraDrops,
     };
 /**
  * @class Base functionality shared by all nodes in this app.
- * @augments hlf.util.BaseClass
+ * @augments hlf.util.Circle
  * @augments hlf.module.EventMixin
  * @property {number} ang Rotation offset.
  * @property {number} luck Chance of certain traits.

@@ -5,8 +5,8 @@
 // ----------------------------------------
 // OVERHEAD
 // ----------------------------------------
-Namespace(pkg + 'sakuraDrops');
-Namespace.use(pkg + '*', function () {
+_.namespace(pkg + 'sakuraDrops');
+_.using(pkg + '*', function () {
 var app = sakuraDrops, 
     C = app.constants.DROP_NODE, // custom
     M = app.Math, 
@@ -52,6 +52,7 @@ app.DropNode = app.BaseNode.extend({
     innerRing: undefined,
     outerSegments: undefined,
     innerSegments: undefined,
+    radStatic: undefined,
     // ----------------------------------------
     // ACCESSORS
     // ----------------------------------------
@@ -90,9 +91,12 @@ app.DropNode = app.BaseNode.extend({
             r = util.simpleRandom(-1, 1) * C.innerBuffer,
             dir = canvas.getAngDir(),
             _this = this;
+        this.radStatic = this.rad;
+        this.rad = 0;
         if (this.hasInnerRing()) {
             this.innerRing = {
-                rad: _this.rad * C.innerRad * d,
+                rad: 0,
+                radStatic: _this.rad * C.innerRad * d,
                 lineWidth: M.sqrt(_this.lineWidth) * C.innerLineWidth * d,
                 angStart: _this.angStart - d + r * M.QTR_PI * dir, 
                 angEnd: _this.angEnd + d + r * M.QTR_PI * dir,
@@ -179,6 +183,12 @@ app.DropNode = app.BaseNode.extend({
             }
             // console.logAtPos('innerSegments', this); 
         }
+    },
+    // ----------------------------------------
+    // UPDATE
+    // ----------------------------------------
+    didUpdate: function () {
+        if (this.rad)
     },
     // ----------------------------------------
     // DRAW

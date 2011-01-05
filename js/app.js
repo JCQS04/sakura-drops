@@ -16,8 +16,8 @@
  * @namespace Application namespace.
  */
 /** @exports app as hlf.sakuraDrops */
-Namespace(pkg + 'sakuraDrops');
-Namespace.use(pkg + '*', function () {
+_.namespace(pkg + 'sakuraDrops');
+_.using(pkg + '*', function () {
 var app = sakuraDrops;
 // ----------------------------------------
 // APP GLOBALS
