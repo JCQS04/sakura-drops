@@ -44,30 +44,30 @@ app.$toolbar = $toolbar;
  * @property {hlf.sakuraDrops.dropManager} m
  */
 app.sketch1 = function () {
-    this.m = app.DropManager.create({
-        num: 10,
-        unitTest: false
-    });
-    $toolbar.hideButton($stopper);
-    this.m.update();
+  this.m = app.DropManager.create({
+    num: 10,
+    unitTest: false
+  });
+  $toolbar.hideButton($stopper);
+  this.m.update();
 };
 /** 
  * On load callback for the page.
  */
 jQuery(document).ready(function ($) {
-    // set globals
-    app.canvas = module.Canvas.create('the-canvas');
-    app.context = app.canvas.context;
-    $stopper = $('#stop-animation').click(function (evt) {
-        app.canvas.togglePauseAndPlay();
-        $stopper.text(($stopper.text === 'stop') ? 'play' : 'stop');
-        evt.preventDefault();
-    });
-    $exporter = $('#export-canvas').click(function (evt) {
-        app.canvas.exportAsImage();
-    });
-    $toolbar = $('#the-canvas-toolbar').toolbar();
-    // run
-    app.sketch1();
+  // set globals
+  app.canvas = module.Canvas.create('the-canvas');
+  app.context = app.canvas.context;
+  $stopper = $('#stop-animation').click(function (evt) {
+    app.canvas.togglePauseAndPlay();
+    $stopper.text(($stopper.text === 'stop') ? 'play' : 'stop');
+    evt.preventDefault();
+  });
+  $exporter = $('#export-canvas').click(function (evt) {
+    app.canvas.exportAsImage();
+  });
+  $toolbar = $('#the-canvas-toolbar').toolbar();
+  // run
+  app.sketch1();
 }); // ready
 }); // namespace
