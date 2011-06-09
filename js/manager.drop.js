@@ -9,14 +9,7 @@ _.namespace(pkg + 'sakuraDrops');
 _.using(pkg + '*', function () {
 var app = sakuraDrops, 
   C = app.constants,
-  M = app.Math, 
-  canvas, context,
-  requireCanvasGlobals = function () {
-    if (!canvas) {
-      canvas = app.canvas;
-      context = canvas.context;
-    }  
-  };
+  M = app.Math;
 // ----------------------------------------
 // CLASS
 // ----------------------------------------
@@ -39,8 +32,8 @@ app.DropManager = app.BaseManager.extend({
    */
   getAttractorPos: function () {
     return {
-      x: canvas.getWidth() / 2,
-      y: canvas.getHeight() / 2
+      x: app.canvas.getWidth() / 2,
+      y: app.canvas.getHeight() / 2
     };
   },    
   // ----------------------------------------
@@ -55,20 +48,19 @@ app.DropManager = app.BaseManager.extend({
    * @see hlf.util.curvingBufferedRandom
    */
   onPopulate: function (i) {
-    requireCanvasGlobals();
-    var x = util.simpleRandom(canvas.getWidth()),
-      y = util.simpleRandom(canvas.getHeight()),
+    var x = util.simpleRandom(app.canvas.getWidth()),
+      y = util.simpleRandom(app.canvas.getHeight()),
       rad = util.curvingBufferedRandom(C.DROP_NODE.rad, .5, 2),
       lineWidth = C.DROP_NODE.lineWidth * rad / C.DROP_NODE.rad,
       angStart = util.simpleRandom(M.TWO_PI) + M.TWO_PI,
       angEnd = angStart + util.bufferedRandom(M.TWO_PI, 2) * 
-        canvas.getAngDir(),
+        app.canvas.getAngDir(),
       params = { 'pos': {'x': x, 'y': y}, 'rad': rad, 'lineWidth': lineWidth,
         'angStart': angStart, 'angEnd': angEnd };
     if (this.unitTest) {
       params.luck = 0; // activate all side cases
     }
-    return app.DropNode.create(params);
+    return new app.DropNode(params);
   },
   /**
    * Sets up the circle packer and binds its drawing socket to the drawing API.
@@ -77,10 +69,10 @@ app.DropManager = app.BaseManager.extend({
    */
   didCreate: function () {
     var _this = this;
-    this.cp = module.CirclePacker.create(this.nodes, 
+    this.cp = new module.CirclePacker(this.nodes, 
       this.getAttractorPos(), C.CIRCLE_PACKER.passes);
     this.cp.bind('drawingSocket', function () {
-      canvas.background('rgb(0,0,0)');
+      app.canvas.background('rgb(0,0,0)');
       _this.draw();
     });
     this.cp.bind('didSettle', function () {

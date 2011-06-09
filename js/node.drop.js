@@ -9,14 +9,7 @@ _.namespace(pkg + 'sakuraDrops');
 _.using(pkg + '*', function () {
 var app = sakuraDrops, 
   C = app.constants.DROP_NODE, // custom
-  M = app.Math, 
-  canvas, context,
-  requireCanvasGlobals = function () {
-    if (!canvas) {
-      canvas = app.canvas;
-      context = canvas.context;
-    }  
-  };
+  M = app.Math;
 // ----------------------------------------
 // CLASS
 // ----------------------------------------
@@ -87,26 +80,25 @@ app.DropNode = app.BaseNode.extend({
    *      constants
    * @see hlf.util.simpleRandom
    */
-  didCreate: function () {
+  _init: function (params) {
+    this._super(params);
     // deviation from base rad
-    requireCanvasGlobals();
     var d = M.sqrt(C.radWithInnerRing / this.rad),
       r = util.simpleRandom(-1, 1) * C.innerBuffer,
-      dir = canvas.getAngDir(),
-      _this = this;
+      dir = app.canvas.getAngDir();
     this.radFinal = this.rad;
     this.rad = 0;
     if (this.hasInnerRing()) {
-      this.innerRing = {
-        rad: undefined,
-        radRatio: C.innerRad * d,
-        lineWidth: M.sqrt(_this.lineWidth) * C.innerLineWidth * d,
-        angStart: _this.angStart - d + r * M.QTR_PI * dir, 
-        angEnd: _this.angEnd + d + r * M.QTR_PI * dir,
-        bridgeBend: d * util.simpleRandom(C.innerBendMin, C.innerBendMax),
-        hasStartBridge: true,
-        hasEndBridge: true
-      };
+      var ring = {};
+      ring.rad = undefined;
+      ring.radRatio = C.innerRad * d;
+      ring.lineWidth = M.sqrt(this.lineWidth) * C.innerLineWidth * d;
+      ring.angStart = this.angStart - d + r * M.QTR_PI * dir;
+      ring.angEnd = this.angEnd + d + r * M.QTR_PI * dir;
+      ring.bridgeBend = d * util.simpleRandom(C.innerBendMin, C.innerBendMax);
+      ring.hasStartBridge = true;
+      ring.hasEndBridge = true;
+      this.innerRing = ring; 
     }
     this._generateSegments();
     this._introAnimation();
@@ -127,7 +119,7 @@ app.DropNode = app.BaseNode.extend({
       seg, s, // base segment length and current length
       ds, // segment flux modifier
       br, // segment break length
-      dir = canvas.getAngDir(), // direction
+      dir = app.canvas.getAngDir(), // direction
       _this = this;
     /** @inner */
     var setupBasePrc = function (type) {
@@ -205,7 +197,7 @@ app.DropNode = app.BaseNode.extend({
           _this.trigger('didAnimationStep');
         }
       };
-    this.introAnimation = canvas.animate(null, callback, duration);
+    this.introAnimation = app.canvas.animate(null, callback, duration);
   },
   // ----------------------------------------
   // DRAW
@@ -248,21 +240,21 @@ app.DropNode = app.BaseNode.extend({
    * @param {!Object number} segment
    */
   _drawOuterRingSegment: function (segment) {
-    context.beginPath();
-    canvas.arc(
+    app.context.beginPath();
+    app.canvas.arc(
       this.pos.x, this.pos.y, this.rad,
       segment.angStart, segment.angEnd, this.ang
     );
-    context.stroke();        
+    app.context.stroke();        
   },
   /** Draws an arc as a new path and sets the stroke. */
   _drawOuterRingBody: function () {
-    context.beginPath();
-    canvas.arc(
+    app.context.beginPath();
+    app.canvas.arc(
       this.pos.x, this.pos.y, this.rad,
       this.angStart, this.angEnd, this.ang
     );
-    context.stroke();
+    app.context.stroke();
   },
   // ----------------------------------------
   // INNER RING
@@ -277,8 +269,8 @@ app.DropNode = app.BaseNode.extend({
    * @see innerGlow constant
    */
   _drawInnerRing: function () {
-    context.save();
-    context.lineWidth = this.innerRing.lineWidth;
+    app.context.save();
+    app.context.lineWidth = this.innerRing.lineWidth;
     if (this.innerRing.hasStartBridge) {
       this._addGlow('_drawInnerRingStart', this.glowDist * C.innerGlow);
     }
@@ -294,63 +286,63 @@ app.DropNode = app.BaseNode.extend({
     if (this.innerRing.hasEndBridge) {
       this._addGlow('_drawInnerRingEnd', this.glowDist * C.innerGlow);
     }
-    context.restore();
+    app.context.restore();
   },
   /** Draws start bridge as a new path and sets the stroke. */
   _drawInnerRingStart: function () {
     var r = this.innerRing;
-    context.beginPath();
-    context.lineTo(
+    app.context.beginPath();
+    app.context.lineTo(
       // outer ring start point
       this.pos.x + this.rad * M.cos(r.angStart + this.ang + r.bridgeBend), 
       this.pos.y + this.rad * M.sin(r.angStart + this.ang + r.bridgeBend) 
     );
-    context.quadraticCurveTo(
+    app.context.quadraticCurveTo(
       // inner ring start point
       this.pos.x + r.rad * M.cos(r.angStart + this.ang + r.bridgeBend),
       this.pos.y + r.rad * M.sin(r.angStart + this.ang + r.bridgeBend),
       this.pos.x + r.rad * M.cos(r.angStart + this.ang),
       this.pos.y + r.rad * M.sin(r.angStart + this.ang)
     );
-    context.stroke();
+    app.context.stroke();
   },
   /** Draws an arc as a new path and sets the stroke. */
   _drawInnerRingBody: function () {
-    context.beginPath();
-    canvas.arc(
+    app.context.beginPath();
+    app.canvas.arc(
       this.pos.x, this.pos.y, this.innerRing.rad,
       this.innerRing.angStart, this.innerRing.angEnd, this.ang
     );
-    context.stroke();
+    app.context.stroke();
   },
   /**
    * Draws an arc as a new path and sets the stroke.
    * @param {!Object number} segment
    */
   _drawInnerRingSegment: function (segment) {
-    context.beginPath();
-    canvas.arc(
+    app.context.beginPath();
+    app.canvas.arc(
       this.pos.x, this.pos.y, this.innerRing.rad,
       segment.angStart, segment.angEnd, this.ang
     );
-    context.stroke();
+    app.context.stroke();
   },
   /** Draws end bridge as a new path and sets the stroke. */
   _drawInnerRingEnd: function () {
     var r = this.innerRing;
-    context.beginPath();
-    context.lineTo(
+    app.context.beginPath();
+    app.context.lineTo(
       this.pos.x + r.rad * M.cos(r.angEnd + this.ang),
       this.pos.y + r.rad * M.sin(r.angEnd + this.ang)
     );
-    context.quadraticCurveTo(
+    app.context.quadraticCurveTo(
       // outer ring end point
       this.pos.x + r.rad * M.cos(r.angEnd + this.ang - r.bridgeBend),
       this.pos.y + r.rad * M.sin(r.angEnd + this.ang - r.bridgeBend),
       this.pos.x + this.rad * M.cos(r.angEnd + this.ang - r.bridgeBend),
       this.pos.y + this.rad * M.sin(r.angEnd + this.ang - r.bridgeBend)
     );
-    context.stroke();
+    app.context.stroke();
   },
   // ----------------------------------------
   // ANIMATE

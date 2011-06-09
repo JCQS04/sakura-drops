@@ -73,7 +73,7 @@ app.BaseNode = util.Circle.extend(util.extend({
    * @see #update
    * @see #didCreate
    */
-  _construct: function (params) {
+  _init: function (params) {
     requireCanvasGlobals();
     this.pos = {};
     this.pos.x = util.toInt(params.pos.x) || canvas.getX();
@@ -87,7 +87,6 @@ app.BaseNode = util.Circle.extend(util.extend({
     this.angEnd = params.angEnd || PI * 2;
     this.inBounds = params.inBounds || false;
     this.isAwake = false;
-    this.didCreate();
   },
   // ----------------------------------------
   // DELEGATES
@@ -235,7 +234,7 @@ app.BaseNode = util.Circle.extend(util.extend({
  *      <br/>num Required.
  *      <br/>unitTest Defaults to false.
  */
-app.BaseManager = util.BaseClass(util.extend(util.CanvasEventMixin, {
+app.BaseManager = util.Class.extend(util.extend(util.CanvasEventMixin, {
   /** @lends app.BaseManager# */
   $canvas: undefined,
   nodes: undefined,
@@ -246,7 +245,7 @@ app.BaseManager = util.BaseClass(util.extend(util.CanvasEventMixin, {
    * @see #didCreate
    * @see #_populate
    */
-  _construct: function (params) {
+  _init: function (params) {
     requireCanvasGlobals();
     this.params = params;
     this.$canvas = $(canvas.canvas);

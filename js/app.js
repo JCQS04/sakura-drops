@@ -19,20 +19,6 @@
 _.namespace(pkg + 'sakuraDrops');
 _.using(pkg + '*', function () {
 var app = sakuraDrops;
-// ----------------------------------------
-// APP GLOBALS
-// ----------------------------------------
-var $stopper, $exporter, $toolbar;
-/**
- * jQuery object resulting from the toolbar plugin. Has buttons including:
- *      #stop-animation and #export-canvas. Own id is #the-canvas-toolbar.
- * @requires jQuery.fn.toolbar
- * @type {jQuery}
- */
-app.$toolbar = $toolbar;
-// ----------------------------------------
-// APP PROCEDURES
-// ----------------------------------------
 /**
  * App procedure #1
  * @requires NamespaceJS. {@link Namespace}
@@ -43,31 +29,30 @@ app.$toolbar = $toolbar;
  * @requires jQuery library. {@link hlf.jquery }
  * @property {hlf.sakuraDrops.dropManager} m
  */
-app.sketch1 = function () {
-  this.m = app.DropManager.create({
+app.DropSketch = module.CanvasApplication.extend({
+  setup: function(){
+    this._super();
+    this.m = new app.DropManager(this.opt);
+    this.$toolbar.hideButton(this.$stopper);
+  },
+  start: function(){
+    this._super();
+    this.m.update();
+  }
+});
+var sketchOne = new app.DropSketch({
     num: 10,
     unitTest: false
   });
-  $toolbar.hideButton($stopper);
-  this.m.update();
-};
 /** 
  * On load callback for the page.
  */
-jQuery(document).ready(function ($) {
-  // set globals
-  app.canvas = module.Canvas.create('the-canvas');
-  app.context = app.canvas.context;
-  $stopper = $('#stop-animation').click(function (evt) {
-    app.canvas.togglePauseAndPlay();
-    $stopper.text(($stopper.text === 'stop') ? 'play' : 'stop');
-    evt.preventDefault();
+$(function(){
+  _.using(pkg + '*', function () {
+    app.canvas = sketchOne.canvas = new module.Canvas('the-canvas');
+    app.context = app.canvas.context;
+    sketchOne.setup();
+    sketchOne.start();
   });
-  $exporter = $('#export-canvas').click(function (evt) {
-    app.canvas.exportAsImage();
-  });
-  $toolbar = $('#the-canvas-toolbar').toolbar();
-  // run
-  app.sketch1();
 }); // ready
 }); // namespace
