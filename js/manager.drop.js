@@ -39,6 +39,23 @@ App.DropManager = App.BaseManager.extend({
   // SETUP
   // ----------------------------------------
   /**
+   * Sets up the circle packer and binds its drawing socket to the drawing API.
+   * @see hlf.hlfModule.CirclePacker#drawingSocket
+   * @see #draw
+   */
+  _init: function(params){
+    this._super(params);
+    this.cp = new Mod.CirclePacker(this.nodes, 
+      this.getAttractorPos(), Co.CIRCLE_PACKER.passes);
+    this.cp.bind_('drawingSocket', function(){
+      App.canvas.background('rgb(0,0,0)');
+      this.draw();
+    }, this);
+    this.cp.bind_('didSettle', function(){
+      this.ready.mouseMove = true;
+    }, this);
+  },
+  /**
    * Sets up node at a random position with pseudo-random size that affects
    *      line width, and pseudorandom length. Note luck is not customized.
    * @param {!int} i Index for node.
@@ -61,24 +78,9 @@ App.DropManager = App.BaseManager.extend({
     }
     return new App.DropNode(params);
   },
-  /**
-   * Sets up the circle packer and binds its drawing socket to the drawing API.
-   * @see hlf.hlfModule.CirclePacker#drawingSocket
-   * @see #draw
-   */
-  didCreate: function(){
-    this.cp = new Mod.CirclePacker(this.nodes, 
-      this.getAttractorPos(), Co.CIRCLE_PACKER.passes);
-    this.cp.bind_('drawingSocket', function(){
-      App.canvas.background('rgb(0,0,0)');
-      this.draw();
-    }, this);
-    this.cp.bind_('didSettle', function(){
-      this.ready.mouseMove = true;
-    }, this);
-  },
   /** Runs / refreshes the circle packer. */
-  onUpdate: function(){
+  update: function(){
+    this._super();
     this.cp.run();
   },
   /** @ignore */

@@ -206,7 +206,8 @@ App.DropNode = App.BaseNode.extend({
    * @see #_drawRing
    * @see #_drawInnerRing
    */
-  onDraw: function(){
+  draw: function(){
+    this._super();
     this._drawRing();
     if (this.hasInnerRing()) {
       this._drawInnerRing();

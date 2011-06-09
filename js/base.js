@@ -79,12 +79,8 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   /**#@+
      Delegate method container; extend and fill as needed.
   */
-  didCreate: function(){},
-  didWake: function(){},
-  didSleep: function(){},
-  onDraw: function(){},
-  onDrawRing: function(){},
   onSpin: function(){},
+  onDrawRing: function(){},
   /**#@-*/
   // ----------------------------------------
   // HELPERS
@@ -100,11 +96,9 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   // ----------------------------------------
   /**
    * Drawing API. Moves the pen first. Supports delegation. 
-   * @see #onDraw
    */
   draw: function(){
     App.canvas.movePlotter(this.pos.x, this.pos.y);
-    this.onDraw();
   },
   /**
    * Root ring drawing function. Sets the stroke and adds glow in own context.
@@ -145,7 +139,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
     }
     this.isAwake = true;
     this.startSpin();
-    this.didWake();
+    this.trigger('didWake');
     // console.logAtPos('woke', this); 
   },
   /**
@@ -157,7 +151,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
     }
     this.isAwake = false;
     this.stopSpin();
-    this.didSleep();
+    this.trigger('didSleep');
     // console.logAtPos('slept', this); 
   },
   /**
@@ -226,30 +220,24 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
   unitTest: undefined,
   ready: undefined,
   /**
-   * @see #didCreate
-   * @see #_populate
+   * @see #populate
    */
   _init: function(params){
     this.params = params;
     this.$canvas = $(App.canvas.canvas);
     this.unitTest = params.unitTest || false;
-    this._populate();
+    this.populate();
     this.bindMouse();
     this.ready = {};
-    this.didCreate();
   },
   // ----------------------------------------
   // DELEGATES
   // ----------------------------------------
   /**#@+
-     Delegate method container; extend and fill as needed. 
+     Delegate method container; extend and fill as needed.
      Return true for will and did delegates to break from the procedure.
   */
   onPopulate: function(){},
-  onUpdate: function(){},
-  didCreate: function(){},
-  didDraw: function(){},
-  didLoad: function(){},
   /**#@-*/
   // ----------------------------------------
   // SETUP NODES
@@ -260,7 +248,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
    * @see hlf.sakuraDrops.BaseNode#didAnimationStep
    * @see #onPopulate
    */ 
-  _populate: function(){
+  populate: function(){
     if (this.unitTest) {
       this.params.num = 1;
     }
@@ -274,11 +262,8 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
   },
   /**
    * Updating API. 
-   * @see #onUpdate
    */
-  update: function(){
-    this.onUpdate();
-  },
+  update: function(){},
   // ----------------------------------------
   // DRAW NODES
   // ----------------------------------------
@@ -301,7 +286,6 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
     for (var i = 0, l = this.nodes.length; i < l; i += 1) {
       this.nodes[i].draw();
     }
-    this.didDraw();
   },
   // ----------------------------------------
   // INPUT
