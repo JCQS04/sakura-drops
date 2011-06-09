@@ -16,9 +16,13 @@
  * @namespace Application namespace.
  */
 /** @exports app as hlf.sakuraDrops */
-_.namespace(pkg + 'sakuraDrops');
-_.using(pkg + '*', function () {
-var app = sakuraDrops;
+// ----------------------------------------
+// INTRO
+// ----------------------------------------
+_.namespace(hlfPkg + '.sakuraDrops');
+(function(hlf){
+var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module, 
+    Co = App.constants, Ma = App.Math;
 /**
  * App procedure #1
  * @requires NamespaceJS. {@link Namespace}
@@ -29,10 +33,10 @@ var app = sakuraDrops;
  * @requires jQuery library. {@link hlf.jquery }
  * @property {hlf.sakuraDrops.dropManager} m
  */
-app.DropSketch = module.CanvasApplication.extend({
+App.DropSketch = Mod.CanvasApplication.extend({
   setup: function(){
     this._super();
-    this.m = new app.DropManager(this.opt);
+    this.m = new App.DropManager(this.opt);
     this.$toolbar.hideButton(this.$stopper);
   },
   start: function(){
@@ -40,7 +44,7 @@ app.DropSketch = module.CanvasApplication.extend({
     this.m.update();
   }
 });
-var sketchOne = new app.DropSketch({
+var sketchOne = new App.DropSketch({
     num: 10,
     unitTest: false
   });
@@ -48,11 +52,12 @@ var sketchOne = new app.DropSketch({
  * On load callback for the page.
  */
 $(function(){
-  _.using(pkg + '*', function () {
-    app.canvas = sketchOne.canvas = new module.Canvas('the-canvas');
-    app.context = app.canvas.context;
-    sketchOne.setup();
-    sketchOne.start();
-  });
+  App.canvas = sketchOne.canvas = new Mod.Canvas('the-canvas');
+  App.context = App.canvas.context;
+  sketchOne.setup();
+  sketchOne.start();
 }); // ready
-}); // namespace
+// ----------------------------------------
+// OUTRO
+// ----------------------------------------
+})(_.namespace(hlfPkg));

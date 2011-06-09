@@ -3,13 +3,12 @@
  * @author peng@pengxwang.com (Peng Wang)
  */
 // ----------------------------------------
-// OVERHEAD
+// INTRO
 // ----------------------------------------
-_.namespace(pkg + 'sakuraDrops');
-_.using(pkg + '*', function () {
-var app = sakuraDrops, 
-  C = app.constants,
-  M = app.Math;
+_.namespace(hlfPkg + '.sakuraDrops');
+(function(hlf) {
+var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module, 
+    Co = App.constants, Ma = App.Math;
 // ----------------------------------------
 // CLASS
 // ----------------------------------------
@@ -17,11 +16,11 @@ var app = sakuraDrops,
  * @class Manager for DropNodes. Responsible for setup and interaction
  *      specific to node instances.
  * @augments hlf.sakuraDrops.BaseManager
- * @property {hlf.module.CirclePacker} cp
+ * @property {hlf.hlfModule.CirclePacker} cp
  */
-app.DropManager = app.BaseManager.extend({
-  /** @lends app.DropManager# */
-  /** @type {module.CirclePacker} */
+App.DropManager = App.BaseManager.extend({
+  /** @lends App.DropManager# */
+  /** @type {hlfModule.CirclePacker} */
   cp: undefined,
   // ----------------------------------------
   // ACCESSORS
@@ -32,8 +31,8 @@ app.DropManager = app.BaseManager.extend({
    */
   getAttractorPos: function () {
     return {
-      x: app.canvas.getWidth() / 2,
-      y: app.canvas.getHeight() / 2
+      x: App.canvas.getWidth() / 2,
+      y: App.canvas.getHeight() / 2
     };
   },    
   // ----------------------------------------
@@ -43,36 +42,36 @@ app.DropManager = app.BaseManager.extend({
    * Sets up node at a random position with pseudo-random size that affects
    *      line width, and pseudorandom length. Note luck is not customized.
    * @param {!int} i Index for node.
-   * @see hlf.util.simpleRandom
-   * @see hlf.util.bufferedRandom
-   * @see hlf.util.curvingBufferedRandom
+   * @see hlf.hlfUtil.simpleRandom
+   * @see hlf.hlfUtil.bufferedRandom
+   * @see hlf.hlfUtil.curvingBufferedRandom
    */
   onPopulate: function (i) {
-    var x = util.simpleRandom(app.canvas.getWidth()),
-      y = util.simpleRandom(app.canvas.getHeight()),
-      rad = util.curvingBufferedRandom(C.DROP_NODE.rad, .5, 2),
-      lineWidth = C.DROP_NODE.lineWidth * rad / C.DROP_NODE.rad,
-      angStart = util.simpleRandom(M.TWO_PI) + M.TWO_PI,
-      angEnd = angStart + util.bufferedRandom(M.TWO_PI, 2) * 
-        app.canvas.getAngDir(),
+    var x = Ut.simpleRandom(App.canvas.getWidth()),
+      y = Ut.simpleRandom(App.canvas.getHeight()),
+      rad = Ut.curvingBufferedRandom(Co.DROP_NODE.rad, .5, 2),
+      lineWidth = Co.DROP_NODE.lineWidth * rad / Co.DROP_NODE.rad,
+      angStart = Ut.simpleRandom(Ma.TWO_PI) + Ma.TWO_PI,
+      angEnd = angStart + Ut.bufferedRandom(Ma.TWO_PI, 2) * 
+        App.canvas.getAngDir(),
       params = { 'pos': {'x': x, 'y': y}, 'rad': rad, 'lineWidth': lineWidth,
         'angStart': angStart, 'angEnd': angEnd };
     if (this.unitTest) {
       params.luck = 0; // activate all side cases
     }
-    return new app.DropNode(params);
+    return new App.DropNode(params);
   },
   /**
    * Sets up the circle packer and binds its drawing socket to the drawing API.
-   * @see hlf.module.CirclePacker#drawingSocket
+   * @see hlf.hlfModule.CirclePacker#drawingSocket
    * @see #draw
    */
   didCreate: function () {
     var _this = this;
-    this.cp = new module.CirclePacker(this.nodes, 
-      this.getAttractorPos(), C.CIRCLE_PACKER.passes);
+    this.cp = new Mod.CirclePacker(this.nodes, 
+      this.getAttractorPos(), Co.CIRCLE_PACKER.passes);
     this.cp.bind('drawingSocket', function () {
-      app.canvas.background('rgb(0,0,0)');
+      App.canvas.background('rgb(0,0,0)');
       _this.draw();
     });
     this.cp.bind('didSettle', function () {
@@ -85,7 +84,10 @@ app.DropManager = app.BaseManager.extend({
   },
   /** @ignore */
   toString: function () {
-    return pkg + 'sakuraDrops.DropManager';
+    return hlfPkg + '.sakuraDrops.DropManager';
   }
 });
-}); // namespace
+// ----------------------------------------
+// OUTRO
+// ----------------------------------------
+})(_.namespace(hlfPkg));

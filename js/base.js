@@ -2,27 +2,13 @@
  * @fileoverview Base classes for Sakura Drops app.
  * @author peng@pengxwang.com (Peng Wang)
  */
-
 // ----------------------------------------
-// OVERHEAD
+// INTRO
 // ----------------------------------------
-_.namespace(pkg + 'sakuraDrops');
-_.using(pkg + '*', function () {
-var app = sakuraDrops, 
-  C = app.constants,
-  M = app.Math, 
-  canvas, context,
-  /** 
-   * A hack to update the scope globals for canvas when canvas is ready. 
-   *      This needs to be called in the constructor of every class and 
-   *      included in files needing the app's scope globals.
-   */
-  requireCanvasGlobals = function () {
-    if (!canvas) {
-      canvas = app.canvas;
-      context = canvas.context;
-    }  
-  };
+_.namespace(hlfPkg + '.sakuraDrops');
+(function(hlf){
+var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module, 
+    Co = App.constants, Ma = App.Math;
 /**
  * @class Base functionality shared by all nodes in this app.
  * @augments hlf.util.Circle
@@ -44,8 +30,8 @@ var app = sakuraDrops,
  *      <br/>rad Defaults to {@link .BASE_RAD}.
  *      <br/>lineWidth Defaults to {@link .BASE_LINEWIDTH}.
  */
-app.BaseNode = util.Circle.extend(util.extend({
-  /** @lends app.BaseNode# */
+App.BaseNode = Ut.Circle.extend(Ut.extend({
+  /** @lends App.BaseNode# */
   ang: undefined,
   luck: undefined,
   lineWidth: undefined,
@@ -63,7 +49,7 @@ app.BaseNode = util.Circle.extend(util.extend({
    * @return {number}
    */
   getArcLen: function () {
-    return M.abs(this.angEnd - this.angStart);
+    return Ma.abs(this.angEnd - this.angStart);
   },
   // ----------------------------------------
   // METHODS
@@ -74,15 +60,14 @@ app.BaseNode = util.Circle.extend(util.extend({
    * @see #didCreate
    */
   _init: function (params) {
-    requireCanvasGlobals();
     this.pos = {};
-    this.pos.x = util.toInt(params.pos.x) || canvas.getX();
-    this.pos.y = util.toInt(params.pos.y) || canvas.getY();
+    this.pos.x = Ut.toInt(params.pos.x) || App.canvas.getX();
+    this.pos.y = Ut.toInt(params.pos.y) || App.canvas.getY();
     this.ang = 0;
-    this.rad = params.rad || C.BASE_NODE.rad;
-    this.luck = util.isNumber(params.luck) ? params.luck : M.random();
-    this.lineWidth = params.lineWidth || C.BASE_NODE.lineWidth;
-    this.glowDist = M.pow(this.lineWidth, 4) + C.BASE_NODE.glowDistance;
+    this.rad = params.rad || Co.BASE_NODE.rad;
+    this.luck = Ut.isNumber(params.luck) ? params.luck : Ma.random();
+    this.lineWidth = params.lineWidth || Co.BASE_NODE.lineWidth;
+    this.glowDist = Ma.pow(this.lineWidth, 4) + Co.BASE_NODE.glowDistance;
     this.angStart = params.angStart || 0;
     this.angEnd = params.angEnd || PI * 2;
     this.inBounds = params.inBounds || false;
@@ -107,8 +92,8 @@ app.BaseNode = util.Circle.extend(util.extend({
   /** Stay within the canvas, adjusted for radius and stroke. */
   stayInBounds: function () {
     var d = this.rad + this.lineWidth * 3;
-    this.pos.x = util.toInt(util.constrain(this.pos.x, d, canvas.getWidth() - d));
-    this.pos.y = util.toInt(util.constrain(this.pos.y, d, canvas.getHeight() - d));
+    this.pos.x = Ut.toInt(Ut.constrain(this.pos.x, d, App.canvas.getWidth() - d));
+    this.pos.y = Ut.toInt(Ut.constrain(this.pos.y, d, App.canvas.getHeight() - d));
   },
   // ----------------------------------------
   // DRAW BASE NODE
@@ -118,7 +103,7 @@ app.BaseNode = util.Circle.extend(util.extend({
    * @see #onDraw
    */
   draw: function () {
-    canvas.movePlotter(this.pos.x, this.pos.y);
+    App.canvas.movePlotter(this.pos.x, this.pos.y);
     this.onDraw();
   },
   /**
@@ -126,10 +111,10 @@ app.BaseNode = util.Circle.extend(util.extend({
    * @see #_addGlow
    */
   _drawRing: function () {
-    context.save();
-    context.lineWidth = this.lineWidth;
+    App.context.save();
+    App.context.lineWidth = this.lineWidth;
     this._addGlow('onDrawRing');
-    context.restore();
+    App.context.restore();
   },
   /**
    * Adds glow to any path, which gets drawn multiple times in own context. 
@@ -138,15 +123,15 @@ app.BaseNode = util.Circle.extend(util.extend({
    * @param {?Array=} callbackArgs Parameters for the socket as needed.
    */
   _addGlow: function (drawLayerSocket, glowDist, callbackArgs) {
-    context.save();
+    App.context.save();
     glowDist = glowDist || this.glowDist;
     var d = 0;
     for (var i = 0; i < glowDist; i += 1) {
-      d = 1 + M.pow(i/glowDist, 2);
-      context.lineWidth += d;
+      d = 1 + Ma.pow(i/glowDist, 2);
+      App.context.lineWidth += d;
       this[drawLayerSocket].apply(this, callbackArgs || []);
     }
-    context.restore();
+    App.context.restore();
   },
   // ----------------------------------------
   // BEHAVIORS
@@ -176,7 +161,7 @@ app.BaseNode = util.Circle.extend(util.extend({
     // console.logAtPos('slept', this); 
   },
   /**
-   * @name app.BaseNode#didAnimationStep
+   * @name App.BaseNode#didAnimationStep
    * @event
    * @param {Event} e
    */
@@ -188,41 +173,41 @@ app.BaseNode = util.Circle.extend(util.extend({
   startSpin: function () {
     var _this = this,
       beginning = this.ang,
-      change = M.PI * util.simpleRandom(C.BASE_NODE.spinMin, C.BASE_NODE.spinMax),
-      duration = C.BASE_NODE.spinSpeed,
+      change = Ma.PI * Ut.simpleRandom(Co.BASE_NODE.spinMin, Co.BASE_NODE.spinMax),
+      duration = Co.BASE_NODE.spinSpeed,
       callback = function (elapsed, complete) {
         if (complete) {
           _this.sleep();
         } else {
-          _this.ang = util.easeInOutCubic(elapsed, beginning, change, duration);
+          _this.ang = Ut.easeInOutCubic(elapsed, beginning, change, duration);
           _this.onSpin();
           _this.trigger('didAnimationStep');
           // console.log('animationStep');
         }
       };
     if (!this.spinAnimation) {
-      this.spinAnimation = canvas.animate(null, callback, duration);
+      this.spinAnimation = App.canvas.animate(null, callback, duration);
     } else {
-      canvas.animate(null, callback, duration, this.spinAnimation);
+      App.canvas.animate(null, callback, duration, this.spinAnimation);
     }
   },
   /**
    * Stops spinning animation.
    */
   stopSpin: function () {
-    canvas.pauseAnimation(this.spinAnimation);
+    App.canvas.pauseAnimation(this.spinAnimation);
   },
   /** @ignore */
   toString: function () {
-    return pkg + 'sakuraDrops.BaseNode';
+    return hlfPkg + '.sakuraDrops.BaseNode';
   }
-}, module.EventMixin));
+}, Mod.EventMixin));
 // ----------------------------------------
 // CLASS
 // ----------------------------------------
 /**
  * @class Base functionality shared by all node managers in this app.
- * @augments hlf.util.BaseClass
+ * @augments hlf.util.Class
  * @augments hlf.module.EventMixin
  * @augments hlf.util.CanvasEventMixin
  * @property {jQuery} $canvas Canvas jQuery element, required for event delegation.
@@ -234,8 +219,8 @@ app.BaseNode = util.Circle.extend(util.extend({
  *      <br/>num Required.
  *      <br/>unitTest Defaults to false.
  */
-app.BaseManager = util.Class.extend(util.extend(util.CanvasEventMixin, {
-  /** @lends app.BaseManager# */
+App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
+  /** @lends App.BaseManager# */
   $canvas: undefined,
   nodes: undefined,
   params: undefined,
@@ -246,9 +231,8 @@ app.BaseManager = util.Class.extend(util.extend(util.CanvasEventMixin, {
    * @see #_populate
    */
   _init: function (params) {
-    requireCanvasGlobals();
     this.params = params;
-    this.$canvas = $(canvas.canvas);
+    this.$canvas = $(App.canvas.canvas);
     this.unitTest = params.unitTest || false;
     this._populate();
     this.bindMouse();
@@ -305,9 +289,9 @@ app.BaseManager = util.Class.extend(util.extend(util.CanvasEventMixin, {
    *      translucent white fill and stroke with round caps.
    */ 
   theme: function () {
-    context.lineCap = 'round';
-    context.fillStyle = 'rgba(255,255,255, .2)';
-    context.strokeStyle = 'rgba(255,255,255, .2)';            
+    App.context.lineCap = 'round';
+    App.context.fillStyle = 'rgba(255,255,255, .2)';
+    App.context.strokeStyle = 'rgba(255,255,255, .2)';            
   },
   /**
    * Drawing API. Runs a loop to use each node's drawing API.
@@ -345,7 +329,7 @@ app.BaseManager = util.Class.extend(util.extend(util.CanvasEventMixin, {
         this.ready.mouseMove = false;
         setTimeout(function () {
           _this.ready.mouseMove = true;
-        }, C.MOUSEMOVE_TIMEOUT);
+        }, Co.MOUSEMOVE_TIMEOUT);
         break;
       }
     }
@@ -361,8 +345,8 @@ app.BaseManager = util.Class.extend(util.extend(util.CanvasEventMixin, {
    */
   _contains: function(node, pos) {
     var dx = node.pos.x - pos.x,
-      dy = node.pos.y - pos.y;
-    return util.dist(dx, dy) <= node.rad;
+        dy = node.pos.y - pos.y;
+    return Ut.dist(dx, dy) <= node.rad;
   },
   /**
    * Utility function to check if nodes overlap.
@@ -372,13 +356,16 @@ app.BaseManager = util.Class.extend(util.extend(util.CanvasEventMixin, {
    */
   _intersects: function(node1, node2) {
     var dx = node2.pos.x - node1.pos.x,
-      dy = node2.pos.y - node1.pos.y,
-      d = util.dist(dx, dy);
+        dy = node2.pos.y - node1.pos.y,
+        d = Ut.dist(dx, dy);
     return d < node1.rad || d < node2.rad;
   },
   /** @ignore */
   toString: function () {
-    return pkg + 'sakuraDrops.BaseManager';
+    return hlfPkg + '.sakuraDrops.BaseManager';
   }
-}, module.EventMixin));
-}); // namespace
+}, Mod.EventMixin));
+// ----------------------------------------
+// OUTRO
+// ----------------------------------------
+})(_.namespace(hlfPkg));
