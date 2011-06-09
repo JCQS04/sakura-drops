@@ -59,7 +59,7 @@ App.constants = {
   },
   MOUSEMOVE_TIMEOUT: 200,
   /** @ignore */
-  toString: function () {
+  toString: function(){
     return hlfPkg + '.sakuraDrops.constants';
   }
 };
@@ -78,7 +78,7 @@ App.Math = Ut.extend(true, M, {
   QTR_PI: QTR_PI = Math.PI / 4,
   /**#@- */ 
   /** @ignore */
-  toString: function () {
+  toString: function(){
     return hlfPkg + '.sakuraDrops.Math';
   }    
 });

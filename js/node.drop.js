@@ -55,14 +55,14 @@ App.DropNode = App.BaseNode.extend({
      @return {boolean}
      @see radWithInnerRing, outerSegmentsChance, innerSegmentsChance constants.
    */
-  hasInnerRing: function () {
+  hasInnerRing: function(){
     return this.innerRing || (this.getArcLen() > Ma.PI && 
       this.radFinal > Co_.radWithInnerRing);
   },
-  hasOuterSegments: function () {
+  hasOuterSegments: function(){
     return this.outerSegments || this.luck <= Co_.outerSegmentsChance;
   },
-  hasInnerSegments: function () {
+  hasInnerSegments: function(){
     return this.innerRing && (this.innerSegments || 
       this.luck <= Co_.innerSegmentsChance);
   },
@@ -79,7 +79,7 @@ App.DropNode = App.BaseNode.extend({
    *      constants
    * @see hlf.util.simpleRandom
    */
-  _init: function (params) {
+  _init: function(params){
     this._super(params);
     // deviation from base rad
     var d = Ma.sqrt(Co_.radWithInnerRing / this.rad),
@@ -110,7 +110,7 @@ App.DropNode = App.BaseNode.extend({
    *      segmentFluxMin, segmentFluxMax constants
    * @see hlf.module.Canvas#getAngDir
    */
-  _generateSegments: function () {
+  _generateSegments: function(){
     var i, l, // counters
         start, // start of ring
         t, // start of current segment
@@ -118,36 +118,35 @@ App.DropNode = App.BaseNode.extend({
         seg, s, // base segment length and current length
         ds, // segment flux modifier
         br, // segment break length
-        dir = App.canvas.getAngDir(), // direction
-        _this = this;
+        dir = App.canvas.getAngDir(); // direction
     /** @inner */
-    var setupBasePrc = function (type) {
-      // console.logArc(type == 'outer' ? _this : _this.innerRing);
+    var setupBasePrc = _.bind(function(type){
+      // console.logArc(type == 'outer' ? this : this.innerRing);
       // console.logArc(dist, 'distance for ' + type);
-      _this[type+'Segments'] = []; i = 0; d = 0; 
+      this[type+'Segments'] = []; i = 0; d = 0; 
       l = Ma.ceil(Ut.simpleRandom(2, Co_[type+'SegmentsMax']));
-      start = (type == 'outer') ? _this.angStart : _this.innerRing.angStart;
+      start = (type == 'outer') ? this.angStart : this.innerRing.angStart;
       seg = dist / l;
       br = Ma.sqrt(segmentFlux(type)) * Co_[type+'SegmentBreak'] * 
-        Ma.max(Ma.pow(_this.lineWidth, 2), 1);
-    };
+        Ma.max(Ma.pow(this.lineWidth, 2), 1);
+    }, this);
     /** @inner */
-    var addSegmentPrc = function (type) { 
+    var addSegmentPrc = _.bind(function(type){ 
       t = start + d * dir; 
       d += s + br;
-      _this[type+'Segments'][i] = {
+      this[type+'Segments'][i] = {
         'angStart': t, 
         'angEnd': t + s * dir
       };
       i += 1;
-    };
+    }, this);
     /** @inner */
-    var segmentFlux = function (type) {
+    var segmentFlux = function(type){
       return Ut.simpleRandom(Co_.segmentFluxMin, 
         Co_.segmentFluxMax);
     };
     /** @inner */
-    var updateSegment = function (type) {
+    var updateSegment = function(type){
       ds = segmentFlux(type);
       s = ds * seg - br;
       if (type == 'outer') {
@@ -155,7 +154,7 @@ App.DropNode = App.BaseNode.extend({
       }
     };
     /** @inner */
-    var canDrawSegment = function (type) {
+    var canDrawSegment = function(type){
       updateSegment(type);
       return dist > d + s + br;
     };
@@ -182,20 +181,19 @@ App.DropNode = App.BaseNode.extend({
   /**
    * TODO
    */
-  _introAnimation: function () {
-    var _this = this,
-        beginning = this.rad,
+  _introAnimation: function(){
+    var beginning = this.rad,
         change = this.radFinal - this.rad,
         duration = Co_.introSpeed,
-        callback = function (elapsed, complete) {
+        callback = _.bind(function(elapsed, complete){
           if (!complete) {
-            _this.rad = Ut.easeInOutCubic(elapsed, beginning, change, duration);
-            if (_this.hasInnerRing()) {
-              _this.innerRing.rad = _this.rad * _this.innerRing.radRatio;
+            this.rad = Ut.easeInOutCubic(elapsed, beginning, change, duration);
+            if (this.hasInnerRing()) {
+              this.innerRing.rad = this.rad * this.innerRing.radRatio;
             }
-            _this.trigger('didAnimationStep');
+            this.trigger('didAnimationStep');
           }
-        };
+        }, this);
     this.introAnimation = App.canvas.animate(null, callback, duration);
   },
   // ----------------------------------------
@@ -208,7 +206,7 @@ App.DropNode = App.BaseNode.extend({
    * @see #_drawRing
    * @see #_drawInnerRing
    */
-  onDraw: function () {
+  onDraw: function(){
     this._drawRing();
     if (this.hasInnerRing()) {
       this._drawInnerRing();
@@ -223,7 +221,7 @@ App.DropNode = App.BaseNode.extend({
    * @see #_drawOuterRingSegment
    * @see #_drawOuterRingBody
    */
-  _drawRing: function () {
+  _drawRing: function(){
     if (this.hasOuterSegments()) {
       for (var i = 0, l = this.outerSegments.length;
         i < l; i += 1) {
@@ -238,7 +236,7 @@ App.DropNode = App.BaseNode.extend({
    * Draws an arc as a new path and sets the stroke.
    * @param {!Object number} segment
    */
-  _drawOuterRingSegment: function (segment) {
+  _drawOuterRingSegment: function(segment){
     App.context.beginPath();
     App.canvas.arc(
       this.pos.x, this.pos.y, this.rad,
@@ -247,7 +245,7 @@ App.DropNode = App.BaseNode.extend({
     App.context.stroke();        
   },
   /** Draws an arc as a new path and sets the stroke. */
-  _drawOuterRingBody: function () {
+  _drawOuterRingBody: function(){
     App.context.beginPath();
     App.canvas.arc(
       this.pos.x, this.pos.y, this.rad,
@@ -267,7 +265,7 @@ App.DropNode = App.BaseNode.extend({
    * @see #_drawInnerRingEnd
    * @see innerGlow constant
    */
-  _drawInnerRing: function () {
+  _drawInnerRing: function(){
     App.context.save();
     App.context.lineWidth = this.innerRing.lineWidth;
     if (this.innerRing.hasStartBridge) {
@@ -288,7 +286,7 @@ App.DropNode = App.BaseNode.extend({
     App.context.restore();
   },
   /** Draws start bridge as a new path and sets the stroke. */
-  _drawInnerRingStart: function () {
+  _drawInnerRingStart: function(){
     var r = this.innerRing;
     App.context.beginPath();
     App.context.lineTo(
@@ -306,7 +304,7 @@ App.DropNode = App.BaseNode.extend({
     App.context.stroke();
   },
   /** Draws an arc as a new path and sets the stroke. */
-  _drawInnerRingBody: function () {
+  _drawInnerRingBody: function(){
     App.context.beginPath();
     App.canvas.arc(
       this.pos.x, this.pos.y, this.innerRing.rad,
@@ -318,7 +316,7 @@ App.DropNode = App.BaseNode.extend({
    * Draws an arc as a new path and sets the stroke.
    * @param {!Object number} segment
    */
-  _drawInnerRingSegment: function (segment) {
+  _drawInnerRingSegment: function(segment){
     App.context.beginPath();
     App.canvas.arc(
       this.pos.x, this.pos.y, this.innerRing.rad,
@@ -327,7 +325,7 @@ App.DropNode = App.BaseNode.extend({
     App.context.stroke();
   },
   /** Draws end bridge as a new path and sets the stroke. */
-  _drawInnerRingEnd: function () {
+  _drawInnerRingEnd: function(){
     var r = this.innerRing;
     App.context.beginPath();
     App.context.lineTo(
@@ -347,7 +345,7 @@ App.DropNode = App.BaseNode.extend({
   // ANIMATE
   // ----------------------------------------
   /** @ignore */
-  toString: function () {
+  toString: function(){
     return hlfPkg + 'sakuraDrops.DropNode';
   }
 });

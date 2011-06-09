@@ -29,7 +29,7 @@ App.DropManager = App.BaseManager.extend({
    * Accessor for center of circle packer. Current center of canvas.
    * @return {Object number}
    */
-  getAttractorPos: function () {
+  getAttractorPos: function(){
     return {
       x: App.canvas.getWidth() / 2,
       y: App.canvas.getHeight() / 2
@@ -46,7 +46,7 @@ App.DropManager = App.BaseManager.extend({
    * @see hlf.hlfUtil.bufferedRandom
    * @see hlf.hlfUtil.curvingBufferedRandom
    */
-  onPopulate: function (i) {
+  onPopulate: function(i){
     var x = Ut.simpleRandom(App.canvas.getWidth()),
       y = Ut.simpleRandom(App.canvas.getHeight()),
       rad = Ut.curvingBufferedRandom(Co.DROP_NODE.rad, .5, 2),
@@ -66,24 +66,23 @@ App.DropManager = App.BaseManager.extend({
    * @see hlf.hlfModule.CirclePacker#drawingSocket
    * @see #draw
    */
-  didCreate: function () {
-    var _this = this;
+  didCreate: function(){
     this.cp = new Mod.CirclePacker(this.nodes, 
       this.getAttractorPos(), Co.CIRCLE_PACKER.passes);
-    this.cp.bind('drawingSocket', function () {
+    this.cp.bind_('drawingSocket', function(){
       App.canvas.background('rgb(0,0,0)');
-      _this.draw();
-    });
-    this.cp.bind('didSettle', function () {
-      _this.ready.mouseMove = true;
-    });
+      this.draw();
+    }, this);
+    this.cp.bind_('didSettle', function(){
+      this.ready.mouseMove = true;
+    }, this);
   },
   /** Runs / refreshes the circle packer. */
-  onUpdate: function () {
+  onUpdate: function(){
     this.cp.run();
   },
   /** @ignore */
-  toString: function () {
+  toString: function(){
     return hlfPkg + '.sakuraDrops.DropManager';
   }
 });

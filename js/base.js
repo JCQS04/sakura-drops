@@ -48,7 +48,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    * Accessor.
    * @return {number}
    */
-  getArcLen: function () {
+  getArcLen: function(){
     return Ma.abs(this.angEnd - this.angStart);
   },
   // ----------------------------------------
@@ -59,7 +59,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    * @see #update
    * @see #didCreate
    */
-  _init: function (params) {
+  _init: function(params){
     this.pos = {};
     this.pos.x = Ut.toInt(params.pos.x) || App.canvas.getX();
     this.pos.y = Ut.toInt(params.pos.y) || App.canvas.getY();
@@ -79,18 +79,18 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   /**#@+
      Delegate method container; extend and fill as needed.
   */
-  didCreate: function () {},
-  didWake: function () {},
-  didSleep: function () {},
-  onDraw: function () {},
-  onDrawRing: function () {},
-  onSpin: function () {},
+  didCreate: function(){},
+  didWake: function(){},
+  didSleep: function(){},
+  onDraw: function(){},
+  onDrawRing: function(){},
+  onSpin: function(){},
   /**#@-*/
   // ----------------------------------------
   // HELPERS
   // ----------------------------------------
   /** Stay within the canvas, adjusted for radius and stroke. */
-  stayInBounds: function () {
+  stayInBounds: function(){
     var d = this.rad + this.lineWidth * 3;
     this.pos.x = Ut.toInt(Ut.constrain(this.pos.x, d, App.canvas.getWidth() - d));
     this.pos.y = Ut.toInt(Ut.constrain(this.pos.y, d, App.canvas.getHeight() - d));
@@ -102,7 +102,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    * Drawing API. Moves the pen first. Supports delegation. 
    * @see #onDraw
    */
-  draw: function () {
+  draw: function(){
     App.canvas.movePlotter(this.pos.x, this.pos.y);
     this.onDraw();
   },
@@ -110,7 +110,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    * Root ring drawing function. Sets the stroke and adds glow in own context.
    * @see #_addGlow
    */
-  _drawRing: function () {
+  _drawRing: function(){
     App.context.save();
     App.context.lineWidth = this.lineWidth;
     this._addGlow('onDrawRing');
@@ -122,7 +122,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    * @param {?number=} glowDist Optional custom distance.
    * @param {?Array=} callbackArgs Parameters for the socket as needed.
    */
-  _addGlow: function (drawLayerSocket, glowDist, callbackArgs) {
+  _addGlow: function(drawLayerSocket, glowDist, callbackArgs){
     App.context.save();
     glowDist = glowDist || this.glowDist;
     var d = 0;
@@ -139,7 +139,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   /**
    * Naturally activate other behaviors and node.
    */
-  wake: function () {
+  wake: function(){
     if (this.isAwake) {
       // return;
     }
@@ -151,7 +151,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   /**
    * Naturally deactivate other behaviors and node.
    */
-  sleep: function () {
+  sleep: function(){
     if (!this.isAwake) {
       // return;
     }
@@ -170,21 +170,20 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    *      for a pseudorandom distance with easing.
    * @see #getSpinStep
    */
-  startSpin: function () {
-    var _this = this,
-      beginning = this.ang,
-      change = Ma.PI * Ut.simpleRandom(Co.BASE_NODE.spinMin, Co.BASE_NODE.spinMax),
-      duration = Co.BASE_NODE.spinSpeed,
-      callback = function (elapsed, complete) {
-        if (complete) {
-          _this.sleep();
-        } else {
-          _this.ang = Ut.easeInOutCubic(elapsed, beginning, change, duration);
-          _this.onSpin();
-          _this.trigger('didAnimationStep');
-          // console.log('animationStep');
-        }
-      };
+  startSpin: function(){
+    var beginning = this.ang,
+        change = Ma.PI * Ut.simpleRandom(Co.BASE_NODE.spinMin, Co.BASE_NODE.spinMax),
+        duration = Co.BASE_NODE.spinSpeed,
+        callback = _.bind(function(elapsed, complete){
+          if (complete) {
+            this.sleep();
+          } else {
+            this.ang = Ut.easeInOutCubic(elapsed, beginning, change, duration);
+            this.onSpin();
+            this.trigger('didAnimationStep');
+            // console.log('animationStep');
+          }
+        }, this);
     if (!this.spinAnimation) {
       this.spinAnimation = App.canvas.animate(null, callback, duration);
     } else {
@@ -194,11 +193,11 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   /**
    * Stops spinning animation.
    */
-  stopSpin: function () {
+  stopSpin: function(){
     App.canvas.pauseAnimation(this.spinAnimation);
   },
   /** @ignore */
-  toString: function () {
+  toString: function(){
     return hlfPkg + '.sakuraDrops.BaseNode';
   }
 }, Mod.EventMixin));
@@ -230,7 +229,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
    * @see #didCreate
    * @see #_populate
    */
-  _init: function (params) {
+  _init: function(params){
     this.params = params;
     this.$canvas = $(App.canvas.canvas);
     this.unitTest = params.unitTest || false;
@@ -246,11 +245,11 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
      Delegate method container; extend and fill as needed. 
      Return true for will and did delegates to break from the procedure.
   */
-  onPopulate: function () {},
-  onUpdate: function () {},
-  didCreate: function () {},
-  didDraw: function () {},
-  didLoad: function () {},
+  onPopulate: function(){},
+  onUpdate: function(){},
+  didCreate: function(){},
+  didDraw: function(){},
+  didLoad: function(){},
   /**#@-*/
   // ----------------------------------------
   // SETUP NODES
@@ -261,24 +260,23 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
    * @see hlf.sakuraDrops.BaseNode#didAnimationStep
    * @see #onPopulate
    */ 
-  _populate: function () {
-    var _this = this;
+  _populate: function(){
     if (this.unitTest) {
       this.params.num = 1;
     }
     this.nodes = [];
     for (var i = 0; i < this.params.num; i += 1) {
       this.nodes[i] = this.onPopulate(i);
-      this.nodes[i].bind('didAnimationStep', function () {
-        _this.draw();
-      });
+      this.nodes[i].bind_('didAnimationStep', function(){
+        this.draw();
+      }, this);
     }        
   },
   /**
    * Updating API. 
    * @see #onUpdate
    */
-  update: function () {
+  update: function(){
     this.onUpdate();
   },
   // ----------------------------------------
@@ -288,7 +286,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
    * Sets the canvas context to use the default theme, which is 
    *      translucent white fill and stroke with round caps.
    */ 
-  theme: function () {
+  theme: function(){
     App.context.lineCap = 'round';
     App.context.fillStyle = 'rgba(255,255,255, .2)';
     App.context.strokeStyle = 'rgba(255,255,255, .2)';            
@@ -298,7 +296,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
    * @see #didDraw
    * @see #theme
    */
-  draw: function () {
+  draw: function(){
     this.theme();
     for (var i = 0, l = this.nodes.length; i < l; i += 1) {
       this.nodes[i].draw();
@@ -316,20 +314,19 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
    * @param {!Event} evt jQuery mousemove event.
    * @todo Disabled sleep on focus out until slowSpin exists.
    */
-  onMouseMove: function (evt) {
+  onMouseMove: function(evt){
     if (!this.ready.mouseMove) {
       return;
     }
     // console.log('onMouseMove');
-    var _this = this;
     for (var i = 0, l = this.nodes.length; i < l; i += 1) {
       if (this._contains(this.nodes[i], {x: evt.offsetX, y: evt.offsetY})) {
         // moved from blank space
         this.nodes[i].wake();
         this.ready.mouseMove = false;
-        setTimeout(function () {
-          _this.ready.mouseMove = true;
-        }, Co.MOUSEMOVE_TIMEOUT);
+        setTimeout(_.bind(function(){
+          this.ready.mouseMove = true;
+        }, this), Co.MOUSEMOVE_TIMEOUT);
         break;
       }
     }
@@ -361,7 +358,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
     return d < node1.rad || d < node2.rad;
   },
   /** @ignore */
-  toString: function () {
+  toString: function(){
     return hlfPkg + '.sakuraDrops.BaseManager';
   }
 }, Mod.EventMixin));
