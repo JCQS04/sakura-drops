@@ -3,11 +3,14 @@
  * @author peng@pengxwang.com (Peng Wang)
  */
 /** @exports app as hlf.sakuraDrops */
-_.namespace(pkg + 'sakuraDrops');
-_.using(pkg + '*', function () {
-var app = sakuraDrops;
+// ----------------------------------------
+// INTRO
+// ----------------------------------------
+_.namespace(hlfPkg + '.sakuraDrops');
+(function(hlf) {
+var App = hlf.sakuraDrops, Ut = hlf.util;
 /** @namespace Group of all app constants. Each property is a set of class constants. */
-app.constants = {
+App.constants = {
   /** 
    * Constants: rad, lineWidth, glowDistance, spinSpeed, spinMin, spinMax
    * @static 
@@ -56,8 +59,8 @@ app.constants = {
   },
   MOUSEMOVE_TIMEOUT: 200,
   /** @ignore */
-  toString: function () {
-    return pkg + 'sakuraDrops.constants';
+  toString: function(){
+    return hlfPkg + '.sakuraDrops.constants';
   }
 };
 var M = Math;
@@ -65,7 +68,7 @@ var M = Math;
  * @name Math
  * @namespace Extended math global.
  */
-app.Math = util.extend(true, M, {
+App.Math = Ut.extend(true, M, {
   /**#@+ 
      @static 
      @fieldOf Math 
@@ -75,8 +78,8 @@ app.Math = util.extend(true, M, {
   QTR_PI: QTR_PI = Math.PI / 4,
   /**#@- */ 
   /** @ignore */
-  toString: function () {
-    return pkg + 'sakuraDrops.Math';
+  toString: function(){
+    return hlfPkg + '.sakuraDrops.Math';
   }    
 });
-}); // namespace
+})(_.namespace(hlfPkg));

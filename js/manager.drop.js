@@ -3,20 +3,12 @@
  * @author peng@pengxwang.com (Peng Wang)
  */
 // ----------------------------------------
-// OVERHEAD
+// INTRO
 // ----------------------------------------
-_.namespace(pkg + 'sakuraDrops');
-_.using(pkg + '*', function () {
-var app = sakuraDrops, 
-  C = app.constants,
-  M = app.Math, 
-  canvas, context,
-  requireCanvasGlobals = function () {
-    if (!canvas) {
-      canvas = app.canvas;
-      context = canvas.context;
-    }  
-  };
+_.namespace(hlfPkg + '.sakuraDrops');
+(function(hlf) {
+var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module, 
+    Co = App.constants, Ma = App.Math;
 // ----------------------------------------
 // CLASS
 // ----------------------------------------
@@ -24,11 +16,11 @@ var app = sakuraDrops,
  * @class Manager for DropNodes. Responsible for setup and interaction
  *      specific to node instances.
  * @augments hlf.sakuraDrops.BaseManager
- * @property {hlf.module.CirclePacker} cp
+ * @property {hlf.hlfModule.CirclePacker} cp
  */
-app.DropManager = app.BaseManager.extend({
-  /** @lends app.DropManager# */
-  /** @type {module.CirclePacker} */
+App.DropManager = App.BaseManager.extend({
+  /** @lends App.DropManager# */
+  /** @type {hlfModule.CirclePacker} */
   cp: undefined,
   // ----------------------------------------
   // ACCESSORS
@@ -37,63 +29,66 @@ app.DropManager = app.BaseManager.extend({
    * Accessor for center of circle packer. Current center of canvas.
    * @return {Object number}
    */
-  getAttractorPos: function () {
+  getAttractorPos: function(){
     return {
-      x: canvas.getWidth() / 2,
-      y: canvas.getHeight() / 2
+      x: App.canvas.getWidth() / 2,
+      y: App.canvas.getHeight() / 2
     };
   },    
   // ----------------------------------------
   // SETUP
   // ----------------------------------------
   /**
+   * Sets up the circle packer and binds its drawing socket to the drawing API.
+   * @see hlf.hlfModule.CirclePacker#drawingSocket
+   * @see #draw
+   */
+  _init: function(params){
+    this._super(params);
+    this.cp = new Mod.CirclePacker(this.nodes, 
+      this.getAttractorPos(), Co.CIRCLE_PACKER.passes);
+    this.cp.bind_('drawingSocket', function(){
+      App.canvas.background('rgb(0,0,0)');
+      this.draw();
+    }, this);
+    this.cp.bind_('didSettle', function(){
+      this.ready.mouseMove = true;
+    }, this);
+  },
+  /**
    * Sets up node at a random position with pseudo-random size that affects
    *      line width, and pseudorandom length. Note luck is not customized.
    * @param {!int} i Index for node.
-   * @see hlf.util.simpleRandom
-   * @see hlf.util.bufferedRandom
-   * @see hlf.util.curvingBufferedRandom
+   * @see hlf.hlfUtil.simpleRandom
+   * @see hlf.hlfUtil.bufferedRandom
+   * @see hlf.hlfUtil.curvingBufferedRandom
    */
-  onPopulate: function (i) {
-    requireCanvasGlobals();
-    var x = util.simpleRandom(canvas.getWidth()),
-      y = util.simpleRandom(canvas.getHeight()),
-      rad = util.curvingBufferedRandom(C.DROP_NODE.rad, .5, 2),
-      lineWidth = C.DROP_NODE.lineWidth * rad / C.DROP_NODE.rad,
-      angStart = util.simpleRandom(M.TWO_PI) + M.TWO_PI,
-      angEnd = angStart + util.bufferedRandom(M.TWO_PI, 2) * 
-        canvas.getAngDir(),
+  onPopulate: function(i){
+    var x = Ut.simpleRandom(App.canvas.getWidth()),
+      y = Ut.simpleRandom(App.canvas.getHeight()),
+      rad = Ut.curvingBufferedRandom(Co.DROP_NODE.rad, .5, 2),
+      lineWidth = Co.DROP_NODE.lineWidth * rad / Co.DROP_NODE.rad,
+      angStart = Ut.simpleRandom(Ma.TWO_PI) + Ma.TWO_PI,
+      angEnd = angStart + Ut.bufferedRandom(Ma.TWO_PI, 2) * 
+        App.canvas.getAngDir(),
       params = { 'pos': {'x': x, 'y': y}, 'rad': rad, 'lineWidth': lineWidth,
         'angStart': angStart, 'angEnd': angEnd };
     if (this.unitTest) {
       params.luck = 0; // activate all side cases
     }
-    return app.DropNode.create(params);
-  },
-  /**
-   * Sets up the circle packer and binds its drawing socket to the drawing API.
-   * @see hlf.module.CirclePacker#drawingSocket
-   * @see #draw
-   */
-  didCreate: function () {
-    var _this = this;
-    this.cp = module.CirclePacker.create(this.nodes, 
-      this.getAttractorPos(), C.CIRCLE_PACKER.passes);
-    this.cp.bind('drawingSocket', function () {
-      canvas.background('rgb(0,0,0)');
-      _this.draw();
-    });
-    this.cp.bind('didSettle', function () {
-      _this.ready.mouseMove = true;
-    });
+    return new App.DropNode(params);
   },
   /** Runs / refreshes the circle packer. */
-  onUpdate: function () {
+  update: function(){
+    this._super();
     this.cp.run();
   },
   /** @ignore */
-  toString: function () {
-    return pkg + 'sakuraDrops.DropManager';
+  toString: function(){
+    return hlfPkg + '.sakuraDrops.DropManager';
   }
 });
-}); // namespace
+// ----------------------------------------
+// OUTRO
+// ----------------------------------------
+})(_.namespace(hlfPkg));
