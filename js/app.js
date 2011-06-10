@@ -56,6 +56,22 @@ $(function(){
   App.context = App.canvas.context;
   sketchOne.setup();
   sketchOne.start();
+  $(document).bind({
+    'on.sequential-pulse': function(){
+      console.log('on');
+    },
+    'off.sequential-pulse': function(){
+      console.log('off');
+    },
+    'on.sequential-spin': function(){
+    },
+    'off.sequential-spin': function(){
+    },
+    'on.sequential-scale': function(){
+    },
+    'off.sequential-scale': function(){
+    },
+  });
 }); // ready
 // ----------------------------------------
 // OUTRO

@@ -45,6 +45,7 @@ App.DropNode = App.BaseNode.extend({
   innerRing: undefined,
   outerSegments: undefined,
   innerSegments: undefined,
+  // TODO doc
   radFinal: undefined,
   introAnimation: undefined,
   // ----------------------------------------
@@ -179,7 +180,7 @@ App.DropNode = App.BaseNode.extend({
     }
   },
   /**
-   * TODO
+   * TODO doc
    */
   _introAnimation: function(){
     var beginning = this.rad,
