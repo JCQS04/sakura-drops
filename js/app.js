@@ -16,23 +16,13 @@
  * @namespace Application namespace.
  */
 /** @exports app as hlf.sakuraDrops */
-_.namespace(pkg + 'sakuraDrops');
-_.using(pkg + '*', function () {
-var app = sakuraDrops;
 // ----------------------------------------
-// APP GLOBALS
+// INTRO
 // ----------------------------------------
-var $stopper, $exporter, $toolbar;
-/**
- * jQuery object resulting from the toolbar plugin. Has buttons including:
- *      #stop-animation and #export-canvas. Own id is #the-canvas-toolbar.
- * @requires jQuery.fn.toolbar
- * @type {jQuery}
- */
-app.$toolbar = $toolbar;
-// ----------------------------------------
-// APP PROCEDURES
-// ----------------------------------------
+_.namespace(hlfPkg + '.sakuraDrops');
+(function(hlf){
+var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module, 
+    Co = App.constants, Ma = App.Math;
 /**
  * App procedure #1
  * @requires NamespaceJS. {@link Namespace}
@@ -43,31 +33,31 @@ app.$toolbar = $toolbar;
  * @requires jQuery library. {@link hlf.jquery }
  * @property {hlf.sakuraDrops.dropManager} m
  */
-app.sketch1 = function () {
-  this.m = app.DropManager.create({
+App.DropSketch = Mod.CanvasApplication.extend({
+  setup: function(){
+    this._super();
+    this.m = new App.DropManager(this.opt);
+    this.$toolbar.hideButton(this.$stopper);
+  },
+  start: function(){
+    this._super();
+    this.m.update();
+  }
+});
+var sketchOne = new App.DropSketch({
     num: 10,
     unitTest: false
   });
-  $toolbar.hideButton($stopper);
-  this.m.update();
-};
 /** 
  * On load callback for the page.
  */
-jQuery(document).ready(function ($) {
-  // set globals
-  app.canvas = module.Canvas.create('the-canvas');
-  app.context = app.canvas.context;
-  $stopper = $('#stop-animation').click(function (evt) {
-    app.canvas.togglePauseAndPlay();
-    $stopper.text(($stopper.text === 'stop') ? 'play' : 'stop');
-    evt.preventDefault();
-  });
-  $exporter = $('#export-canvas').click(function (evt) {
-    app.canvas.exportAsImage();
-  });
-  $toolbar = $('#the-canvas-toolbar').toolbar();
-  // run
-  app.sketch1();
+$(function(){
+  App.canvas = sketchOne.canvas = new Mod.Canvas('the-canvas');
+  App.context = App.canvas.context;
+  sketchOne.setup();
+  sketchOne.start();
 }); // ready
-}); // namespace
+// ----------------------------------------
+// OUTRO
+// ----------------------------------------
+})(_.namespace(hlfPkg));
