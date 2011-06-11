@@ -92,14 +92,13 @@ App.DropManager = App.BaseManager.extend({
   },
   startPulse: function(type){
     switch (type) {
-      case Co.PULSING.SEQUENTIAL:
+      case Co.PULSE.SEQUENTIAL:
         break;
-      case Co.PULSING.UNIFORM:
+      case Co.PULSE.UNIFORM:
         break;
     }
   },
   stopPulse: function(){
-    
   },
   /** @ignore */
   toString: function(){

@@ -53,7 +53,7 @@ App.constants = {
   /**
    * TODO doc
    */
-  PULSING: {
+  PULSE: {
     SEQUENTIAL: 0,
     UNIFORM: 1
   },
