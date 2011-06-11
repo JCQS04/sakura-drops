@@ -45,6 +45,11 @@ App.DropManager = App.BaseManager.extend({
    */
   _init: function(params){
     this._super(params);
+    if (this.unitTest) {
+      this.draw();
+      this.ready.mouseMove = true;
+      return;
+    }
     this.cp = new Mod.CirclePacker(this.nodes, 
       this.getAttractorPos(), Co.CIRCLE_PACKER.passes);
     this.cp.bind_('drawingSocket', function(){
@@ -64,19 +69,24 @@ App.DropManager = App.BaseManager.extend({
    * @see hlf.hlfUtil.curvingBufferedRandom
    */
   onPopulate: function(i){
-    var x = Ut.simpleRandom(App.canvas.getWidth()),
-      y = Ut.simpleRandom(App.canvas.getHeight()),
-      rad = Ut.curvingBufferedRandom(Co.DROP_NODE.rad, .5, 2),
-      lineWidth = Co.DROP_NODE.lineWidth * rad / Co.DROP_NODE.rad,
-      angStart = Ut.simpleRandom(Ma.TWO_PI) + Ma.TWO_PI,
-      angEnd = angStart + Ut.bufferedRandom(Ma.TWO_PI, 2) * 
-        App.canvas.getAngDir(),
-      params = { 'pos': {'x': x, 'y': y}, 'rad': rad, 'lineWidth': lineWidth,
-        'angStart': angStart, 'angEnd': angEnd };
+    var p = {};
     if (this.unitTest) {
-      params.luck = 0; // activate all side cases
+      p.pos = { 
+        x: 0,
+        y: 0
+      };
+    } else {
+      p.pos = { 
+        x: Ut.simpleRandom(App.canvas.getWidth()),
+        y: Ut.simpleRandom(App.canvas.getHeight()),
+      };
     }
-    return new App.DropNode(params);
+    p.rad = Ut.curvingBufferedRandom(Co.DROP_NODE.rad, .5, 2);
+    p.lineWidth = Co.DROP_NODE.lineWidth * p.rad / Co.DROP_NODE.rad;
+    p.angStart = Ut.simpleRandom(Ma.TWO_PI) + Ma.TWO_PI;
+    p.angEnd = p.angStart + Ut.bufferedRandom(Ma.TWO_PI, 2) * App.canvas.getAngDir(),
+    p.unitTest = this.unitTest;
+    return new App.DropNode(p);
   },
   /** Runs / refreshes the circle packer. */
   update: function(){

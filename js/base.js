@@ -41,6 +41,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   inBounds: undefined,
   isAwake: undefined,
   spinAnimation: undefined,
+  unitTest: undefined,
   // ----------------------------------------
   // ACCESSORS
   // ----------------------------------------
@@ -61,8 +62,8 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    */
   _init: function(params){
     this.pos = {};
-    this.pos.x = Ut.toInt(params.pos.x) || App.canvas.getX();
-    this.pos.y = Ut.toInt(params.pos.y) || App.canvas.getY();
+    this.pos.x = Ut.toInt(params.pos.x || App.canvas.getCenter().x);
+    this.pos.y = Ut.toInt(params.pos.y || App.canvas.getCenter().y);
     this.ang = 0;
     this.rad = params.rad || Co.BASE_NODE.rad;
     this.luck = Ut.isNumber(params.luck) ? params.luck : Ma.random();
@@ -72,6 +73,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
     this.angEnd = params.angEnd || PI * 2;
     this.inBounds = params.inBounds || false;
     this.isAwake = false;
+    this.unitTest = params.unitTest || false;
   },
   // ----------------------------------------
   // DELEGATES
@@ -237,6 +239,9 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
      Delegate method container; extend and fill as needed.
      Return true for will and did delegates to break from the procedure.
   */
+  /**
+   * @return {hlf.sakuraDrops.BaseNode node}
+   */
   onPopulate: function(){},
   /**#@-*/
   // ----------------------------------------

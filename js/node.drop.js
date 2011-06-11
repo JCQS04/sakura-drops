@@ -87,7 +87,11 @@ App.DropNode = App.BaseNode.extend({
         r = Ut.simpleRandom(-1, 1) * Co_.innerBuffer,
         dir = App.canvas.getAngDir();
     this.radFinal = this.rad;
-    this.rad = 0;
+    if (this.unitTest) {
+      this.luck = 0;
+    } else {
+      this.rad = 0;
+    }
     if (this.hasInnerRing()) {
       var ring = {};
       ring.rad = undefined;
@@ -101,7 +105,9 @@ App.DropNode = App.BaseNode.extend({
       this.innerRing = ring; 
     }
     this._generateSegments();
-    this._introAnimation();
+    if (this.unitTest) {
+      this._introAnimation();
+    }
   },
   /**
    * Super method for generating arc segment data for both outer and inner
@@ -195,7 +201,7 @@ App.DropNode = App.BaseNode.extend({
             this.trigger('didAnimationStep');
           }
         }, this);
-    this.introAnimation = App.canvas.animate(null, callback, duration);
+      this.introAnimation = App.canvas.animate(null, callback, duration);
   },
   // ----------------------------------------
   // DRAW
