@@ -42,11 +42,31 @@ App.DropSketch = Mod.CanvasApplication.extend({
   start: function(){
     this._super();
     this.m.update();
+    $(document).bind('on off', $.proxy(function(evt){
+      console.log(evt.type);
+    }, this));
   }
+/*
+      'on.sequential-pulse': function(){
+        
+      },
+      'off.sequential-pulse': function(){
+        console.log('off');
+      },
+      'on.sequential-spin': function(){
+      },
+      'off.sequential-spin': function(){
+      },
+      'on.sequential-scale': function(){
+      },
+      'off.sequential-scale': function(){
+      },
+
+*/
 });
 var sketchOne = new App.DropSketch({
     num: 10,
-    unitTest: false
+    unitTest: true
   });
 /** 
  * On load callback for the page.
@@ -56,22 +76,6 @@ $(function(){
   App.context = App.canvas.context;
   sketchOne.setup();
   sketchOne.start();
-  $(document).bind({
-    'on.sequential-pulse': function(){
-      console.log('on');
-    },
-    'off.sequential-pulse': function(){
-      console.log('off');
-    },
-    'on.sequential-spin': function(){
-    },
-    'off.sequential-spin': function(){
-    },
-    'on.sequential-scale': function(){
-    },
-    'off.sequential-scale': function(){
-    },
-  });
 }); // ready
 // ----------------------------------------
 // OUTRO

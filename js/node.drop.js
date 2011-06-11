@@ -87,7 +87,9 @@ App.DropNode = App.BaseNode.extend({
         r = Ut.simpleRandom(-1, 1) * Co_.innerBuffer,
         dir = App.canvas.getAngDir();
     this.radFinal = this.rad;
-    this.rad = 0;
+    if (this.unitTest) {
+      this.luck = 0;
+    } 
     if (this.hasInnerRing()) {
       var ring = {};
       ring.rad = undefined;
@@ -101,7 +103,11 @@ App.DropNode = App.BaseNode.extend({
       this.innerRing = ring; 
     }
     this._generateSegments();
-    this._introAnimation();
+    if (this.unitTest) {
+      this._updateInnerRing();
+    } else {      
+      this._introAnimation();
+    }
   },
   /**
    * Super method for generating arc segment data for both outer and inner
@@ -183,19 +189,26 @@ App.DropNode = App.BaseNode.extend({
    * TODO doc
    */
   _introAnimation: function(){
+    this.rad = 0;
     var beginning = this.rad,
         change = this.radFinal - this.rad,
         duration = Co_.introSpeed,
         callback = _.bind(function(elapsed, complete){
           if (!complete) {
             this.rad = Ut.easeInOutCubic(elapsed, beginning, change, duration);
-            if (this.hasInnerRing()) {
-              this.innerRing.rad = this.rad * this.innerRing.radRatio;
-            }
+            this._updateInnerRing();
             this.trigger('didAnimationStep');
           }
         }, this);
     this.introAnimation = App.canvas.animate(null, callback, duration);
+  },
+  /**
+   * TODO doc
+   */
+  _updateInnerRing: function(){
+    if (this.hasInnerRing()) {
+      this.innerRing.rad = this.rad * this.innerRing.radRatio;
+    }
   },
   // ----------------------------------------
   // DRAW
