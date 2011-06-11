@@ -89,9 +89,7 @@ App.DropNode = App.BaseNode.extend({
     this.radFinal = this.rad;
     if (this.unitTest) {
       this.luck = 0;
-    } else {
-      this.rad = 0;
-    }
+    } 
     if (this.hasInnerRing()) {
       var ring = {};
       ring.rad = undefined;
@@ -106,6 +104,8 @@ App.DropNode = App.BaseNode.extend({
     }
     this._generateSegments();
     if (this.unitTest) {
+      this._updateInnerRing();
+    } else {      
       this._introAnimation();
     }
   },
@@ -189,19 +189,26 @@ App.DropNode = App.BaseNode.extend({
    * TODO doc
    */
   _introAnimation: function(){
+    this.rad = 0;
     var beginning = this.rad,
         change = this.radFinal - this.rad,
         duration = Co_.introSpeed,
         callback = _.bind(function(elapsed, complete){
           if (!complete) {
             this.rad = Ut.easeInOutCubic(elapsed, beginning, change, duration);
-            if (this.hasInnerRing()) {
-              this.innerRing.rad = this.rad * this.innerRing.radRatio;
-            }
+            this._updateInnerRing();
             this.trigger('didAnimationStep');
           }
         }, this);
       this.introAnimation = App.canvas.animate(null, callback, duration);
+  },
+  /**
+   * TODO doc
+   */
+  _updateInnerRing: function(){
+    if (this.hasInnerRing()) {
+      this.innerRing.rad = this.rad * this.innerRing.radRatio;
+    }
   },
   // ----------------------------------------
   // DRAW

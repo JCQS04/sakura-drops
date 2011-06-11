@@ -48,7 +48,14 @@ App.constants = {
     innerSegmentBreak: 1 / 6,
     segmentFluxMin: 1 / 2,
     segmentFluxMax: 3 / 2,
-    introSpeed: 500
+    introSpeed: 500,
+  },
+  /**
+   * TODO doc
+   */
+  PULSE: {
+    SEQUENTIAL: 0,
+    UNIFORM: 1
   },
   /** 
    * Constants: passes.
@@ -57,6 +64,9 @@ App.constants = {
   CIRCLE_PACKER: {
     passes: 35
   },
+  /**
+   * TODO doc
+   */
   MOUSEMOVE_TIMEOUT: 200,
   /** @ignore */
   toString: function(){

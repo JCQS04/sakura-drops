@@ -61,9 +61,10 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    * @see #didCreate
    */
   _init: function(params){
-    this.pos = {};
-    this.pos.x = Ut.toInt(params.pos.x || App.canvas.getCenter().x);
-    this.pos.y = Ut.toInt(params.pos.y || App.canvas.getCenter().y);
+    this.pos = params.pos || {
+      x: App.canvas.getWidth()/2,
+      y: App.canvas.getHeight()/2
+    };
     this.ang = 0;
     this.rad = params.rad || Co.BASE_NODE.rad;
     this.luck = Ut.isNumber(params.luck) ? params.luck : Ma.random();

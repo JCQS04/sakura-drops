@@ -70,28 +70,35 @@ App.DropManager = App.BaseManager.extend({
    */
   onPopulate: function(i){
     var p = {};
-    if (this.unitTest) {
+    if (!this.unitTest) {
       p.pos = { 
-        x: 0,
-        y: 0
-      };
-    } else {
-      p.pos = { 
-        x: Ut.simpleRandom(App.canvas.getWidth()),
-        y: Ut.simpleRandom(App.canvas.getHeight()),
+        x: Ut.toInt(Ut.simpleRandom(App.canvas.getWidth())),
+        y: Ut.toInt(Ut.simpleRandom(App.canvas.getHeight()))
       };
     }
     p.rad = Ut.curvingBufferedRandom(Co.DROP_NODE.rad, .5, 2);
     p.lineWidth = Co.DROP_NODE.lineWidth * p.rad / Co.DROP_NODE.rad;
     p.angStart = Ut.simpleRandom(Ma.TWO_PI) + Ma.TWO_PI;
-    p.angEnd = p.angStart + Ut.bufferedRandom(Ma.TWO_PI, 2) * App.canvas.getAngDir(),
+    p.angEnd = p.angStart + Ut.bufferedRandom(Ma.TWO_PI, 2) * App.canvas.getAngDir();
     p.unitTest = this.unitTest;
     return new App.DropNode(p);
   },
   /** Runs / refreshes the circle packer. */
   update: function(){
     this._super();
-    this.cp.run();
+    if (this.cp) {
+      this.cp.run();
+    }
+  },
+  startPulse: function(type){
+    switch (type) {
+      case Co.PULSE.SEQUENTIAL:
+        break;
+      case Co.PULSE.UNIFORM:
+        break;
+    }
+  },
+  stopPulse: function(){
   },
   /** @ignore */
   toString: function(){

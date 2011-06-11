@@ -36,12 +36,19 @@ var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module,
 App.DropSketch = Mod.CanvasApplication.extend({
   setup: function(){
     this._super();
-    this.m = new App.DropManager(this.opt);
+    this.m1 = new App.DropManager(this.opt);
     this.$toolbar.hideButton(this.$stopper);
   },
   start: function(){
     this._super();
-    this.m.update();
+    this.m1.update();
+    $(document).bind('on off', $.proxy(this._toggleControlHandler, this));
+  },
+  manager: function(){
+    return this.m1;
+  },
+  constants: function(){
+    return Co;
   }
 });
 var sketchOne = new App.DropSketch({
@@ -56,22 +63,6 @@ $(function(){
   App.context = App.canvas.context;
   sketchOne.setup();
   sketchOne.start();
-  $(document).bind({
-    'on.sequential-pulse': function(){
-      console.log('on');
-    },
-    'off.sequential-pulse': function(){
-      console.log('off');
-    },
-    'on.sequential-spin': function(){
-    },
-    'off.sequential-spin': function(){
-    },
-    'on.sequential-scale': function(){
-    },
-    'off.sequential-scale': function(){
-    },
-  });
 }); // ready
 // ----------------------------------------
 // OUTRO
