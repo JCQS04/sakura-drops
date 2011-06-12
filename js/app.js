@@ -42,7 +42,6 @@ App.DropSketch = Mod.CanvasApplication.extend({
   start: function(){
     this._super();
     this.m1.update();
-    $(document).bind('on off', $.proxy(this._toggleControlHandler, this));
   },
   manager: function(){
     return this.m1;
@@ -61,6 +60,7 @@ var sketchOne = new App.DropSketch({
 $(function(){
   App.canvas = sketchOne.canvas = new Mod.Canvas('the-canvas');
   App.context = App.canvas.context;
+  App.palette = App.canvas.palette;
   sketchOne.setup();
   sketchOne.start();
 }); // ready

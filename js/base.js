@@ -23,6 +23,7 @@ var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module,
  * @property {boolean} isAwake Waking behavior, generally waking on user
  *      interaction and returning to sleep after a period of inactivity.
  * @property {number} spinAnimation Animation id in the canvas' index.
+ * TODO doc
  * @param {!Object} params Parameters as key-value pairs:
  *      <br/>pos Defaults to current canvas pen position.
  *      <br/>ang Defaults to 0.
@@ -36,12 +37,15 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   luck: undefined,
   lineWidth: undefined,
   glowDist: undefined,
+  glowVal: undefined,
   angStart: undefined,
   angEnd: undefined,
   inBounds: undefined,
   isAwake: undefined,
   spinAnimation: undefined,
+  pulseAnimation: undefined,
   unitTest: undefined,
+  _runningAnimations: undefined,
   // ----------------------------------------
   // ACCESSORS
   // ----------------------------------------
@@ -62,19 +66,21 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    */
   _init: function(params){
     this.pos = params.pos || {
-      x: App.canvas.getWidth()/2,
-      y: App.canvas.getHeight()/2
+      x: App.canvas.getWidth() / 2,
+      y: App.canvas.getHeight() / 2
     };
     this.ang = 0;
     this.rad = params.rad || Co.BASE_NODE.rad;
     this.luck = Ut.isNumber(params.luck) ? params.luck : Ma.random();
     this.lineWidth = params.lineWidth || Co.BASE_NODE.lineWidth;
     this.glowDist = Ma.pow(this.lineWidth, 4) + Co.BASE_NODE.glowDistance;
+    this.glowVal = params.glowVal || Co.BASE_NODE.glowValue;
     this.angStart = params.angStart || 0;
     this.angEnd = params.angEnd || PI * 2;
     this.inBounds = params.inBounds || false;
     this.isAwake = false;
     this.unitTest = params.unitTest || false;
+    this._runningAnimations = [];
   },
   // ----------------------------------------
   // DELEGATES
@@ -83,6 +89,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
      Delegate method container; extend and fill as needed.
   */
   onSpin: function(){},
+  onPulse: function(){},
   onDrawRing: function(){},
   /**#@-*/
   // ----------------------------------------
@@ -136,26 +143,48 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   /**
    * Naturally activate other behaviors and node.
    */
-  wake: function(){
-    if (this.isAwake) {
-      // return;
+  _tryToWake: function(){
+    if (this.isAwake || !this._runningAnimations.length) {
+      return;
     }
     this.isAwake = true;
-    this.startSpin();
     this.trigger('didWake');
     // console.logAtPos('woke', this); 
   },
   /**
    * Naturally deactivate other behaviors and node.
    */
-  sleep: function(){
-    if (!this.isAwake) {
-      // return;
+  _tryToSleep: function(){
+    if (!this.isAwake || this._runningAnimations.length) {
+      return;
     }
     this.isAwake = false;
-    this.stopSpin();
     this.trigger('didSleep');
     // console.logAtPos('slept', this); 
+  },
+  /**
+   * TODO doc
+   */
+  _startAnimation: function(name, callback, duration, options){
+    name = name+'Animation';
+    if (!name in this || this._runningAnimations.indexOf(name) !== -1) {
+      return;
+    }
+    this[name] = App.canvas.animate(options, callback, duration, this[name]);
+    this._runningAnimations.push(name);
+    this._tryToWake();
+  },
+  /**
+   * TODO doc
+   */
+  _stopAnimation: function(name){
+    name = name+'Animation';
+    if (!name in this || this._runningAnimations.indexOf(name) === -1) {
+      return;
+    }
+    App.canvas.pauseAnimation(this[name]);
+    this._runningAnimations.splice(this._runningAnimations.indexOf(name), 1);
+    this._tryToSleep();
   },
   /**
    * @name App.BaseNode#didAnimationStep
@@ -173,25 +202,56 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
         duration = Co.BASE_NODE.spinSpeed,
         callback = _.bind(function(elapsed, complete){
           if (complete) {
-            this.sleep();
-          } else {
-            this.ang = Ut.easeInOutCubic(elapsed, beginning, change, duration);
-            this.onSpin();
-            this.trigger('didAnimationStep');
-            // console.log('animationStep');
-          }
+            this.stopSpin();
+            return;
+          } 
+          this.ang = Ut.easeInOutCubic(elapsed, beginning, change, duration);
+          this.onSpin();
+          this.trigger('didAnimationStep');
+          // console.log('animationStep');
         }, this);
-    if (!this.spinAnimation) {
-      this.spinAnimation = App.canvas.animate(null, callback, duration);
-    } else {
-      App.canvas.animate(null, callback, duration, this.spinAnimation);
-    }
+    this._startAnimation('spin', callback, duration);
   },
   /**
    * Stops spinning animation.
    */
   stopSpin: function(){
-    App.canvas.pauseAnimation(this.spinAnimation);
+    this._stopAnimation('spin');
+  },
+  /**
+   * TODO doc
+   */
+  startPulse: function(dir){
+    var options = { repeat: true },
+        _origin = beginning = this.glowVal,
+        change = this.glowVal/2,
+        duration = Co.BASE_NODE.glowSpeed,
+        callback = _.bind(function(elapsed, complete){
+          if (complete) {
+            beginning = this.glowVal;
+            change *= -1;
+            if (Ma.abs(beginning - _origin) < 0.01) {
+              this.trigger('didPulsePeriod');
+            }
+          } 
+          this.glowVal = Ut.easeInOutCubic(elapsed, beginning, change, duration);
+          App.context.strokeStyle = App.canvas.foregroundColor
+            .stringWithAlpha(this.glowVal);
+          this.onPulse();
+          this.trigger('didAnimationStep');
+        }, this);
+    this._startAnimation('pulse', callback, duration, options);
+  },
+  /**
+   * TODO doc
+   */
+  stopPulse: function(){
+    var cb = _.bind(function(){
+          this._stopAnimation('pulse');
+          this.unbind('didPulsePeriod', cb);
+          this.trigger('didAnimationStep');
+        }, this);
+    this.bind('didPulsePeriod', cb);
   },
   /** @ignore */
   toString: function(){
@@ -229,6 +289,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
     this.params = params;
     this.$canvas = $(App.canvas.canvas);
     this.unitTest = params.unitTest || false;
+    this.setTheme();
     this.populate();
     this.bindMouse();
     this.ready = {};
@@ -269,7 +330,9 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
   /**
    * Updating API. 
    */
-  update: function(){},
+  update: function(){
+      this.setTheme();
+  },
   // ----------------------------------------
   // DRAW NODES
   // ----------------------------------------
@@ -277,10 +340,14 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
    * Sets the canvas context to use the default theme, which is 
    *      translucent white fill and stroke with round caps.
    */ 
-  theme: function(){
+  setTheme: function(){
+    App.canvas.backgroundColor = App.palette.black;
+    App.canvas.foregroundColor = App.palette.white;
     App.context.lineCap = 'round';
-    App.context.fillStyle = 'rgba(255,255,255, .2)';
-    App.context.strokeStyle = 'rgba(255,255,255, .2)';            
+    App.context.fillStyle = App.canvas.foregroundColor
+      .stringWithAlpha(Co.BASE_NODE.glowValue);
+    App.context.strokeStyle = App.canvas.foregroundColor
+      .stringWithAlpha(Co.BASE_NODE.glowValue);
   },
   /**
    * Drawing API. Runs a loop to use each node's drawing API.
@@ -288,7 +355,6 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
    * @see #theme
    */
   draw: function(){
-    this.theme();
     for (var i = 0, l = this.nodes.length; i < l; i += 1) {
       this.nodes[i].draw();
     }
@@ -312,7 +378,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
     for (var i = 0, l = this.nodes.length; i < l; i += 1) {
       if (this._contains(this.nodes[i], {x: evt.offsetX, y: evt.offsetY})) {
         // moved from blank space
-        this.nodes[i].wake();
+        this.nodes[i].startSpin();
         this.ready.mouseMove = false;
         setTimeout(_.bind(function(){
           this.ready.mouseMove = true;
@@ -346,6 +412,30 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
         dy = node2.pos.y - node1.pos.y,
         d = Ut.dist(dx, dy);
     return d < node1.rad || d < node2.rad;
+  },
+  /**
+   * TODO doc
+   */
+  startPulse: function(type){
+    switch (type) {
+      case Co.PULSE.SEQUENTIAL:
+        this.nodes[0].startPulse();
+        break;
+      case Co.PULSE.UNIFORM:
+        break;
+    }
+  },
+  /**
+   * TODO doc
+   */
+  stopPulse: function(type){
+    switch (type) {
+      case Co.PULSE.SEQUENTIAL:
+        this.nodes[0].stopPulse();
+        break;
+      case Co.PULSE.UNIFORM:
+        break;
+    }
   },
   /** @ignore */
   toString: function(){

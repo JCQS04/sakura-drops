@@ -53,7 +53,7 @@ App.DropManager = App.BaseManager.extend({
     this.cp = new Mod.CirclePacker(this.nodes, 
       this.getAttractorPos(), Co.CIRCLE_PACKER.passes);
     this.cp.bind_('drawingSocket', function(){
-      App.canvas.background('rgb(0,0,0)');
+      App.canvas.background();
       this.draw();
     }, this);
     this.cp.bind_('didSettle', function(){
@@ -89,16 +89,6 @@ App.DropManager = App.BaseManager.extend({
     if (this.cp) {
       this.cp.run();
     }
-  },
-  startPulse: function(type){
-    switch (type) {
-      case Co.PULSE.SEQUENTIAL:
-        break;
-      case Co.PULSE.UNIFORM:
-        break;
-    }
-  },
-  stopPulse: function(){
   },
   /** @ignore */
   toString: function(){

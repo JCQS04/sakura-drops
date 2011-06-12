@@ -19,7 +19,9 @@ App.constants = {
     rad: 20,
     lineWidth: 2,
     glowDistance: 2,
+    glowValue: 0.2,
     spinSpeed: 500,
+    glowSpeed: 500,
     spinMin: 1 / 2,
     spinMax: 2
   },
