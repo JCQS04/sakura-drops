@@ -210,7 +210,6 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
           this.ang = Ut.easeInOutCubic(elapsed, beginning, change, duration);
           this.onSpin();
           this.trigger('didAnimationStep');
-          // console.log('animationStep');
         }, this);
     this._startAnimation('spin', callback, duration);
   },

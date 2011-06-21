@@ -187,6 +187,7 @@ App.DropNode = App.BaseNode.extend({
   },
   /**
    * TODO doc
+   * TODO refactor into startScale
    */
   _introAnimation: function(){
     this.rad = 0;
@@ -194,13 +195,15 @@ App.DropNode = App.BaseNode.extend({
         change = this.radFinal - this.rad,
         duration = Co_.introSpeed,
         callback = _.bind(function(elapsed, complete){
-          if (!complete) {
-            this.rad = Ut.easeInOutCubic(elapsed, beginning, change, duration);
-            this._updateInnerRing();
-            this.trigger('didAnimationStep');
+          if (complete) {
+            this._stopAnimation('intro');
+            return;
           }
+          this.rad = Ut.easeInOutCubic(elapsed, beginning, change, duration);
+          this._updateInnerRing();
+          this.trigger('didAnimationStep');
         }, this);
-      this.introAnimation = App.canvas.animate(null, callback, duration);
+    this._startAnimation('intro', callback, duration);
   },
   /**
    * TODO doc
