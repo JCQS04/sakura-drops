@@ -173,6 +173,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
       return;
     }
     this[name] = App.canvas.animate(options, callback, duration, this[name]);
+    // console.log(this[name], 'Animation started');
     this._runningAnimations.push(name);
     this._tryToWake();
   },
@@ -185,6 +186,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
       return;
     }
     App.canvas.pauseAnimation(this[name]);
+    // console.log(this[name], 'Animation stopped');
     this._runningAnimations.splice(this._runningAnimations.indexOf(name), 1);
     this._tryToSleep();
   },

@@ -53,7 +53,7 @@ App.DropManager = App.BaseManager.extend({
     this.cp = new Mod.CirclePacker(this.nodes, 
       this.getAttractorPos(), Co.CIRCLE_PACKER.passes);
     this.cp.bind_('drawingSocket', function(){
-      App.canvas.background();
+      App.canvas.clear();
       this.draw();
     }, this);
     this.cp.bind_('didSettle', function(){

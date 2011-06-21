@@ -52,7 +52,7 @@ App.DropSketch = Mod.CanvasApplication.extend({
 });
 var sketchOne = new App.DropSketch({
     num: 10,
-    unitTest: true
+    unitTest: false
   });
 /** 
  * On load callback for the page.
