@@ -144,6 +144,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    * Naturally activate other behaviors and node.
    */
   _tryToWake: function(){
+    // console.log('try to wake');
     if (this.isAwake || !this._runningAnimations.length) {
       return;
     }
@@ -155,6 +156,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    * Naturally deactivate other behaviors and node.
    */
   _tryToSleep: function(){
+    // console.log('try to sleep');
     if (!this.isAwake || this._runningAnimations.length) {
       return;
     }
