@@ -56,8 +56,9 @@ App.constants = {
    * TODO doc
    */
   PULSE: {
-    SEQUENTIAL: 0,
-    UNIFORM: 1
+    DEFAULT: 0,
+    SEQUENTIAL: 1,
+    UNIFORM: 2
   },
   /** 
    * Constants: passes.

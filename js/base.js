@@ -60,7 +60,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   // METHODS
   // ----------------------------------------
   /**
-   * Sets up node and does some initial actions. Supports delegation.
+   * Sets up node and does some initial actions. 
    * @see #update
    * @see #didCreate
    */
@@ -88,8 +88,6 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   /**#@+
      Delegate method container; extend and fill as needed.
   */
-  onSpin: function(){},
-  onPulse: function(){},
   onDrawRing: function(){},
   /**#@-*/
   // ----------------------------------------
@@ -105,10 +103,11 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   // DRAW BASE NODE
   // ----------------------------------------
   /**
-   * Drawing API. Moves the pen first. Supports delegation. 
+   * Drawing API. Moves the pen first. 
    */
   draw: function(){
     App.canvas.movePlotter(this.pos.x, this.pos.y);
+    // handle it in subclass  
   },
   /**
    * Root ring drawing function. Sets the stroke and adds glow in own context.
@@ -210,7 +209,6 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
             return;
           } 
           this.ang = Ut.easeInOutCubic(elapsed, beginning, change, duration);
-          this.onSpin();
           this.trigger('didAnimationStep');
         }, this);
     this._startAnimation('spin', callback, duration);
@@ -224,10 +222,11 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   /**
    * TODO doc
    */
-  startPulse: function(dir){
+  startPulse: function(type, dir){
+    dir = (typeof dir !== 'undefined') ? dir : 1;
     var options = { repeat: true },
         _origin = beginning = this.glowVal,
-        change = this.glowVal/2,
+        change = this.glowVal/2 * dir,
         duration = Co.BASE_NODE.glowSpeed,
         callback = _.bind(function(elapsed, complete){
           if (complete) {
@@ -237,22 +236,22 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
               this.trigger('didPulsePeriod');
             }
           } 
+          this.trigger('willDoAnimationStep', type);
           this.glowVal = Ut.easeInOutCubic(elapsed, beginning, change, duration);
           App.context.strokeStyle = App.canvas.foregroundColor
             .stringWithAlpha(this.glowVal);
-          this.onPulse();
-          this.trigger('didAnimationStep');
+          this.trigger('didAnimationStep', type);
         }, this);
     this._startAnimation('pulse', callback, duration, options);
   },
   /**
    * TODO doc
    */
-  stopPulse: function(){
+  stopPulse: function(type){
     var cb = _.bind(function(){
           this._stopAnimation('pulse');
           this.unbind('didPulsePeriod', cb);
-          this.trigger('didAnimationStep');
+          this.trigger('didAnimationStep', type);
         }, this);
     this.bind('didPulsePeriod', cb);
   },
@@ -325,8 +324,16 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
     this.nodes = [];
     for (var i = 0; i < this.params.num; i += 1) {
       this.nodes[i] = this.onPopulate(i);
-      this.nodes[i].bind_('didAnimationStep', function(){
+      this.nodes[i].bind_('willDoAnimationStep', function(animationType){
+        if (animationType === Co.PULSE.SEQUENTIAL) {
+          App.context.save();
+        } 
+      }, this);
+      this.nodes[i].bind_('didAnimationStep', function(animationType){
         this.draw();
+        if (animationType === Co.PULSE.SEQUENTIAL) {
+          App.context.restore();
+        } 
       }, this);
     }        
   },
@@ -422,7 +429,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
   startPulse: function(type){
     switch (type) {
       case Co.PULSE.SEQUENTIAL:
-        this.nodes[0].startPulse();
+        this.nodes[0].startPulse(type);
         break;
       case Co.PULSE.UNIFORM:
         break;
@@ -434,7 +441,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
   stopPulse: function(type){
     switch (type) {
       case Co.PULSE.SEQUENTIAL:
-        this.nodes[0].stopPulse();
+        this.nodes[0].stopPulse(type);
         break;
       case Co.PULSE.UNIFORM:
         break;

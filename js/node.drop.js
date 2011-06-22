@@ -229,6 +229,7 @@ App.DropNode = App.BaseNode.extend({
     if (this.hasInnerRing()) {
       this._drawInnerRing();
     }
+    App.context.restore();
   },
   // ----------------------------------------
   // OUTER RING
