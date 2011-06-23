@@ -10,6 +10,66 @@ _.namespace(hlfPkg + '.sakuraDrops');
 var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module, 
     Co = App.constants, Ma = App.Math;
 /**
+ * TODO doc
+ */
+App.RipplingMixin = {
+  canRipple: true,
+  currentRipple: undefined,
+  /**
+   * TODO doc
+   */
+  startRipple: function(type){
+    var node = this._randomNode();
+    this.currentRipple = {
+      affectedNodes: []
+    };
+    console.log(node, 'startRipple');
+    this.affectNode(node, type);
+  },
+  /**
+   * TODO doc
+   */
+  stopRipple: function(){
+    for (var i = 0; i < this.nodes.length; i += 1) {
+      if (this.nodes[i].isAwake) {
+        this.nodes[i].stopRippleEffect();
+      }
+    }
+  },
+  /**
+   * TODO doc
+   */
+  affectNode: function(node, type){
+    node.bind_('rippleDidAffect', this.afterAffectNode, this);
+    node.startRippleEffect(type);
+  },
+  /**
+   * TODO doc
+   */
+  afterAffectNode: function(node, type){
+    this.currentRipple.affectedNodes.push(node.uid);
+    this.affectNodeNeighbors(node, type);
+    node.unbind('rippleDidAffect');
+  },
+  /**
+   * TODO doc
+   */
+  affectNodeNeighbors: function(node, type){
+    var testNode = Ut.extend({}, node);
+    testNode.rad += 5;
+    console.log(testNode, 'affectNodeNeighbors');
+    for (var i = 0; i < this.nodes.length; i += 1) {
+      if (this._nodesIntersect(this.nodes[i], testNode)
+          && this.currentRipple.affectedNodes.indexOf(this.nodes[i].uid) === -1
+          && this.nodes[i].uid !== testNode.uid) {
+        console.log(this.nodes[i], 'affectNode');
+        this.affectNode(this.nodes[i], type);
+      }
+    }
+  }
+};
+
+/**
  * @class Base functionality shared by all nodes in this app.
  * @augments hlf.util.Circle
  * @augments hlf.module.EventMixin
@@ -33,6 +93,7 @@ var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module,
  */
 App.BaseNode = Ut.Circle.extend(Ut.extend({
   /** @lends App.BaseNode# */
+  uid: undefined,
   ang: undefined,
   luck: undefined,
   lineWidth: undefined,
@@ -65,10 +126,8 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    * @see #didCreate
    */
   _init: function(params){
-    this.pos = params.pos || {
-      x: App.canvas.getWidth() / 2,
-      y: App.canvas.getHeight() / 2
-    };
+    this.uid = params.uid;
+    this.pos = params.pos || App.canvas.getCenter();
     this.ang = 0;
     this.rad = params.rad || Co.BASE_NODE.rad;
     this.luck = Ut.isNumber(params.luck) ? params.luck : Ma.random();
@@ -170,6 +229,9 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
     name = name+'Animation';
     if (!name in this || this._runningAnimations.indexOf(name) !== -1) {
       return;
+      // throw {
+      //   message: 'Animation cannot run'
+      // };
     }
     this[name] = App.canvas.animate(options, callback, duration, this[name]);
     // console.log(this[name], 'Animation started');
@@ -221,12 +283,12 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   },
   /**
    * TODO doc
+   * TODO refine oscillation
    */
-  startPulse: function(type, dir){
-    dir = (typeof dir !== 'undefined') ? dir : 1;
-    var options = { repeat: true },
-        _origin = beginning = this.glowVal,
-        change = this.glowVal/2 * dir,
+  startPulse: function(type, options, cb){
+    options = Ut.extend(Co.PULSE.defaultOptions, options);
+    var _origin = beginning = this.glowVal,
+        change = this.glowVal/2 * options.dir,
         duration = Co.BASE_NODE.glowSpeed,
         callback = _.bind(function(elapsed, complete){
           if (complete) {
@@ -234,10 +296,21 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
             change *= -1;
             if (Ma.abs(beginning - _origin) < 0.01) {
               this.trigger('didPulsePeriod');
+              if (typeof cb !== 'undefined') {
+                cb();
+              }
+              if (options.repeat === 1) {
+                this.stopPulse(type, true);
+                return;
+              }
+              if (options.repeat && options.repeat < Infinity) {
+                options.repeat -= 1;
+              }
             }
           } 
           this.trigger('willDoAnimationStep', type);
           this.glowVal = Ut.easeInOutCubic(elapsed, beginning, change, duration);
+          // console.log(this.glowVal, this.uid, 'frame');
           App.context.strokeStyle = App.canvas.foregroundColor
             .stringWithAlpha(this.glowVal);
           this.trigger('didAnimationStep', type);
@@ -246,14 +319,38 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   },
   /**
    * TODO doc
+   * Eased interruption
    */
-  stopPulse: function(type){
-    var cb = _.bind(function(){
-          this._stopAnimation('pulse');
-          this.unbind('didPulsePeriod', cb);
-          this.trigger('didAnimationStep', type);
-        }, this);
-    this.bind('didPulsePeriod', cb);
+  stopPulse: function(type, force){
+    if (force) {
+      this._stopAnimation('pulse');
+    } else {
+      var cb = _.bind(function(){
+            this._stopAnimation('pulse');
+            this.unbind('didPulsePeriod', cb);
+            this.trigger('didAnimationStep', type); // ?
+          }, this);
+      this.bind('didPulsePeriod', cb);
+    }
+  },
+  /**
+   * TODO doc
+   */
+  startRippleEffect: function(type){
+    if (type === Co.PULSE.SEQUENTIAL) {
+      this.startPulse(type, { repeat:1 }, _.bind(function(){
+        this.trigger('rippleDidAffect', this, type);
+      }, this));
+      console.log(this.uid, 'startRippleEffect');
+    }
+  },
+  /**
+   * TODO doc
+   */
+  stopRippleEffect: function(type){
+    if (type === Co.PULSE.SEQUENTIAL) {
+      this.stopPulse();
+    }
   },
   /** @ignore */
   toString: function(){
@@ -324,14 +421,16 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
     this.nodes = [];
     for (var i = 0; i < this.params.num; i += 1) {
       this.nodes[i] = this.onPopulate(i);
-      this.nodes[i].bind_('willDoAnimationStep', function(animationType){
-        if (animationType === Co.PULSE.SEQUENTIAL) {
+      this.nodes[i].bind_('willDoAnimationStep', function(type){
+        if (type === Co.PULSE.SEQUENTIAL) {
+          // console.log('saving');
           App.context.save();
         } 
       }, this);
-      this.nodes[i].bind_('didAnimationStep', function(animationType){
+      this.nodes[i].bind_('didAnimationStep', function(type){
         this.draw();
-        if (animationType === Co.PULSE.SEQUENTIAL) {
+        if (type === Co.PULSE.SEQUENTIAL) {
+          // console.log('restoring');
           App.context.restore();
         } 
       }, this);
@@ -386,7 +485,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
     }
     // console.log('onMouseMove');
     for (var i = 0, l = this.nodes.length; i < l; i += 1) {
-      if (this._contains(this.nodes[i], {x: evt.offsetX, y: evt.offsetY})) {
+      if (this._nodeContainsPoint(this.nodes[i], {x: evt.offsetX, y: evt.offsetY})) {
         // moved from blank space
         this.nodes[i].startSpin();
         this.ready.mouseMove = false;
@@ -406,22 +505,28 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
    * @param {!Object number} pos 
    * @return {boolean}
    */
-  _contains: function(node, pos) {
+  _nodeContainsPoint: function(node, pos) {
     var dx = node.pos.x - pos.x,
         dy = node.pos.y - pos.y;
     return Ut.dist(dx, dy) <= node.rad;
   },
   /**
-   * Utility function to check if nodes overlap.
+   * Utility function to check if nodes intersect.
    * @param {!hlf.sakuraDrops.BaseNode} node1 
    * @param {!hlf.sakuraDrops.BaseNode} node2 
    * @return {boolean}
    */
-  _intersects: function(node1, node2) {
+  _nodesIntersect: function(node1, node2) {
     var dx = node2.pos.x - node1.pos.x,
         dy = node2.pos.y - node1.pos.y,
         d = Ut.dist(dx, dy);
-    return d < node1.rad || d < node2.rad;
+    return d < node1.rad + node2.rad;
+  },
+  /**
+   * TODO doc
+   */
+  _randomNode: function(){
+    return this.nodes[Ut.toInt(Ut.simpleRandom(this.nodes.length-1))];
   },
   /**
    * TODO doc
@@ -429,7 +534,9 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
   startPulse: function(type){
     switch (type) {
       case Co.PULSE.SEQUENTIAL:
-        this.nodes[0].startPulse(type);
+        if (this.canRipple) {
+          this.startRipple(type);
+        }
         break;
       case Co.PULSE.UNIFORM:
         break;
@@ -441,7 +548,9 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
   stopPulse: function(type){
     switch (type) {
       case Co.PULSE.SEQUENTIAL:
-        this.nodes[0].stopPulse(type);
+        if (this.canRipple) {
+          this.stopRipple(type);
+        }
         break;
       case Co.PULSE.UNIFORM:
         break;
@@ -451,7 +560,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
   toString: function(){
     return hlfPkg + '.sakuraDrops.BaseManager';
   }
-}, Mod.EventMixin));
+}, Mod.EventMixin, App.RipplingMixin));
 // ----------------------------------------
 // OUTRO
 // ----------------------------------------

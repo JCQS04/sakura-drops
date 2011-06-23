@@ -70,11 +70,9 @@ App.DropManager = App.BaseManager.extend({
    */
   onPopulate: function(i){
     var p = {};
+    p.uid = i;
     if (!this.unitTest) {
-      p.pos = { 
-        x: Ut.toInt(Ut.simpleRandom(App.canvas.getWidth())),
-        y: Ut.toInt(Ut.simpleRandom(App.canvas.getHeight()))
-      };
+      p.pos = App.canvas.randomLocation();
     }
     p.rad = Ut.curvingBufferedRandom(Co.DROP_NODE.rad, .5, 2);
     p.lineWidth = Co.DROP_NODE.lineWidth * p.rad / Co.DROP_NODE.rad;

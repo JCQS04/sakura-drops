@@ -58,7 +58,11 @@ App.constants = {
   PULSE: {
     DEFAULT: 0,
     SEQUENTIAL: 1,
-    UNIFORM: 2
+    UNIFORM: 2,
+    defaultOptions: {
+      repeat: Infinity,
+      dir: 1 
+    }
   },
   /** 
    * Constants: passes.
