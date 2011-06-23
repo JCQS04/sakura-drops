@@ -296,15 +296,15 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
             change *= -1;
             if (Ma.abs(beginning - _origin) < 0.01) {
               this.trigger('didPulsePeriod');
-              if (typeof cb !== 'undefined') {
-                cb();
-              }
-              if (options.repeat === 1) {
-                this.stopPulse(type, true);
-                return;
-              }
               if (options.repeat && options.repeat < Infinity) {
                 options.repeat -= 1;
+              }
+              if (!options.repeat) {
+                this.stopPulse(type, true);
+                if (typeof cb !== 'undefined') {
+                  cb();
+                }
+                return;
               }
             }
           } 
