@@ -19,3 +19,19 @@ Spinning
 Expanding
 Contracting
 Radiating
+
+/// DEBUG
+
+startPulse() -> 
+  startRipple() ->
+    set node
+    set currentRipple 
+    affectNode() ->
+      set currentRipple.affectedNodes
+      node binds to rippleWillAffect
+      node startRippleEffect() ->
+        node startPulse() ->
+          node _startAnimation() ->
+            App.canvas.animate() ->
+            node updates _runningAnimations
+            node _tryToWake() ->
