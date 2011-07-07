@@ -201,7 +201,7 @@ App.DropNode = App.BaseNode.extend({
           }
           this.rad = Ut.easeInOutCubic(elapsed, beginning, change, duration);
           this._updateInnerRing();
-          this.trigger('didAnimationStep');
+          this.trigger('didAnimationStep', this);
         }, this);
     this._startAnimation('intro', callback, duration);
   },
@@ -285,7 +285,6 @@ App.DropNode = App.BaseNode.extend({
    * @see innerGlow constant
    */
   _drawInnerRing: function(){
-    App.context.save();
     App.context.lineWidth = this.innerRing.lineWidth;
     if (this.innerRing.hasStartBridge) {
       this._addGlow('_drawInnerRingStart', this.glowDist * Co_.innerGlow);
@@ -302,7 +301,6 @@ App.DropNode = App.BaseNode.extend({
     if (this.innerRing.hasEndBridge) {
       this._addGlow('_drawInnerRingEnd', this.glowDist * Co_.innerGlow);
     }
-    App.context.restore();
   },
   /** Draws start bridge as a new path and sets the stroke. */
   _drawInnerRingStart: function(){

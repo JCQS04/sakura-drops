@@ -9,65 +9,6 @@ _.namespace(hlfPkg + '.sakuraDrops');
 (function(hlf){
 var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module, 
     Co = App.constants, Ma = App.Math;
-/**
- * TODO doc
- */
-App.RipplingMixin = {
-  canRipple: true,
-  currentRipple: undefined,
-  /**
-   * TODO doc
-   */
-  startRipple: function(type){
-    var node = this._randomNode();
-    this.currentRipple = {
-      affectedNodes: []
-    };
-    console.log(node, 'startRipple');
-    this.affectNode(node, type);
-  },
-  /**
-   * TODO doc
-   */
-  stopRipple: function(){
-    for (var i = 0; i < this.nodes.length; i += 1) {
-      if (this.nodes[i].isAwake) {
-        this.nodes[i].stopRippleEffect();
-      }
-    }
-  },
-  /**
-   * TODO doc
-   */
-  affectNode: function(node, type){
-    node.bind_('rippleDidAffect', this.afterAffectNode, this);
-    node.startRippleEffect(type);
-  },
-  /**
-   * TODO doc
-   */
-  afterAffectNode: function(node, type){
-    this.currentRipple.affectedNodes.push(node.uid);
-    this.affectNodeNeighbors(node, type);
-    node.unbind('rippleDidAffect');
-  },
-  /**
-   * TODO doc
-   */
-  affectNodeNeighbors: function(node, type){
-    var testNode = Ut.extend({}, node);
-    testNode.rad += 5;
-    console.log(testNode, 'affectNodeNeighbors');
-    for (var i = 0; i < this.nodes.length; i += 1) {
-      if (this._nodesIntersect(this.nodes[i], testNode)
-          && this.currentRipple.affectedNodes.indexOf(this.nodes[i].uid) === -1
-          && this.nodes[i].uid !== testNode.uid) {
-        console.log(this.nodes[i], 'affectNode');
-        this.affectNode(this.nodes[i], type);
-      }
-    }
-  }
-};
 
 /**
  * @class Base functionality shared by all nodes in this app.
@@ -94,6 +35,7 @@ App.RipplingMixin = {
 App.BaseNode = Ut.Circle.extend(Ut.extend({
   /** @lends App.BaseNode# */
   uid: undefined,
+  neighbors: undefined,
   ang: undefined,
   luck: undefined,
   lineWidth: undefined,
@@ -116,6 +58,12 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    */
   getArcLen: function(){
     return Ma.abs(this.angEnd - this.angStart);
+  },
+  getWidth: function(){
+    return (this.rad + this.glowDist) * 2;
+  },
+  getHeight: function(){
+    return this.getWidth();
   },
   // ----------------------------------------
   // METHODS
@@ -207,7 +155,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
       return;
     }
     this.isAwake = true;
-    this.trigger('didWake');
+    this.trigger('didWake', this);
     // console.logAtPos('woke', this); 
   },
   /**
@@ -219,7 +167,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
       return;
     }
     this.isAwake = false;
-    this.trigger('didSleep');
+    this.trigger('didSleep', this);
     // console.logAtPos('slept', this); 
   },
   /**
@@ -233,7 +181,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
       //   message: 'Animation cannot run'
       // };
     }
-    this[name] = App.canvas.animate(options, callback, duration, this[name]);
+    this[name] = App.canvas.animate(options, callback, duration, this[name], this);
     // console.log(this[name], 'Animation started');
     this._runningAnimations.push(name);
     this._tryToWake();
@@ -271,7 +219,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
             return;
           } 
           this.ang = Ut.easeInOutCubic(elapsed, beginning, change, duration);
-          this.trigger('didAnimationStep');
+          this.trigger('didAnimationStep', this);
         }, this);
     this._startAnimation('spin', callback, duration);
   },
@@ -295,7 +243,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
             beginning = this.glowVal;
             change *= -1;
             if (Ma.abs(beginning - _origin) < 0.01) {
-              this.trigger('didPulsePeriod');
+              this.trigger('didPulsePeriod', this);
               if (options.repeat && options.repeat < Infinity) {
                 options.repeat -= 1;
               }
@@ -308,12 +256,12 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
               }
             }
           } 
-          this.trigger('willDoAnimationStep', type);
+          this.trigger('willDoAnimationStep', this, type);
           this.glowVal = Ut.easeInOutCubic(elapsed, beginning, change, duration);
           // console.log(this.glowVal, this.uid, 'frame');
           App.context.strokeStyle = App.canvas.foregroundColor
             .stringWithAlpha(this.glowVal);
-          this.trigger('didAnimationStep', type);
+          this.trigger('didAnimationStep', this, type);
         }, this);
     this._startAnimation('pulse', callback, duration, options);
   },
@@ -328,7 +276,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
       var cb = _.bind(function(){
             this._stopAnimation('pulse');
             this.unbind('didPulsePeriod', cb);
-            this.trigger('didAnimationStep', type); // ?
+            this.trigger('didAnimationStep', this, type); // ?
           }, this);
       this.bind('didPulsePeriod', cb);
     }
@@ -339,6 +287,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
   startRippleEffect: function(type){
     if (type === Co.PULSE.SEQUENTIAL) {
       this.startPulse(type, { repeat:1 }, _.bind(function(){
+        console.log(this.uid, 'rippleDidAffect');
         this.trigger('rippleDidAffect', this, type);
       }, this));
       console.log(this.uid, 'startRippleEffect');
@@ -357,6 +306,62 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
     return hlfPkg + '.sakuraDrops.BaseNode';
   }
 }, Mod.EventMixin));
+/**
+ * TODO doc
+ */
+App.RipplingMixin = {
+  canRipple: true,
+  currentRipple: undefined,
+  /**
+   * TODO doc
+   */
+  startRipple: function(type){
+    var node = this._randomNode();
+    this.currentRipple = {
+      affectedNodes: []
+    };
+    this.affectNode(node, type);
+  },
+  /**
+   * TODO doc
+   */
+  stopRipple: function(){
+    for (var i = 0; i < this.nodes.length; i += 1) {
+      if (this.nodes[i].isAwake) {
+        this.nodes[i].stopRippleEffect();
+      }
+    }
+    this.currentRipple = undefined;
+  },
+  /**
+   * TODO doc
+   */
+  affectNode: function(node, type){
+    this.currentRipple.affectedNodes.push(node.uid);
+    console.log(this.currentRipple.affectedNodes, 'rippleWillAffect');
+    node.bind_('rippleDidAffect', this.afterAffectNode, this);
+    node.startRippleEffect(type);
+  },
+  /**
+   * TODO doc
+   */
+  afterAffectNode: function(node, type){
+    this.affectNodeNeighbors(node, type);
+    node.unbind('rippleDidAffect');
+  },
+  /**
+   * TODO doc
+   */
+  affectNodeNeighbors: function(node, type){
+    this._performOnNodeNeighbors(node, _.bind(function(node_){
+      if (this.currentRipple.affectedNodes.indexOf(node_.uid) !== -1) {
+        console.log(node_, 'already affected');
+        return;
+      }
+      this.affectNode(node_, type);
+    }, this));
+  }
+};
 // ----------------------------------------
 // CLASS
 // ----------------------------------------
@@ -421,14 +426,18 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
     this.nodes = [];
     for (var i = 0; i < this.params.num; i += 1) {
       this.nodes[i] = this.onPopulate(i);
-      this.nodes[i].bind_('willDoAnimationStep', function(type){
+      this.nodes[i].bind_('willDoAnimationStep', function(node, type){
         if (type === Co.PULSE.SEQUENTIAL) {
           // console.log('saving');
           App.context.save();
         } 
       }, this);
-      this.nodes[i].bind_('didAnimationStep', function(type){
+      this.nodes[i].bind_('didAnimationStep', function(node, type){
         this.draw();
+        // this._performOnNodeNeighbors(node, function(node_){
+        //   App.canvas.clear(node_);
+        //   node_.draw();
+        // });
         if (type === Co.PULSE.SEQUENTIAL) {
           // console.log('restoring');
           App.context.restore();
@@ -527,6 +536,21 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
    */
   _randomNode: function(){
     return this.nodes[Ut.toInt(Ut.simpleRandom(this.nodes.length-1))];
+  },
+  _performOnNodeNeighbors: function(node, cb, opt){
+    opt = opt || {};
+    if (opt.force === true || !node.neighbors) {
+      var mock = Ut.extend({}, node);
+      mock.rad += 5;
+      node.neighbors = _.select(this.nodes, function(node_){
+        if (this._nodesIntersect(mock, node) && node_.uid !== node.uid) {
+          return node_;
+        }
+      }, this);
+    }
+    for (var i = 0, l = node.neighbors.length; i < l; i += 1) {
+      cb(node.neighbors[i]);
+    }    
   },
   /**
    * TODO doc
