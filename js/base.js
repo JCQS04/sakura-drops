@@ -113,7 +113,9 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    * Drawing API. Moves the pen first. 
    */
   draw: function(){
+    // console.log(this.glowVal);
     App.canvas.movePlotter(this.pos.x, this.pos.y);
+    App.context.save();
     // handle it in subclass  
   },
   /**
@@ -258,7 +260,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
           } 
           this.trigger('willDoAnimationStep', this, type);
           this.glowVal = Ut.easeInOutCubic(elapsed, beginning, change, duration);
-          // console.log(this.glowVal, this.uid, 'frame');
+          // console.logRecord(this.glowVal, this.uid, Date.now());
           App.context.strokeStyle = App.canvas.foregroundColor
             .stringWithAlpha(this.glowVal);
           this.trigger('didAnimationStep', this, type);
@@ -286,7 +288,8 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
    */
   startRippleEffect: function(type){
     if (type === Co.PULSE.SEQUENTIAL) {
-      this.startPulse(type, { repeat:1 }, _.bind(function(){
+      var repeat = this.unitTest ? Infinity : 1;
+      this.startPulse(type, { repeat:repeat }, _.bind(function(){
         console.log(this.uid, 'rippleDidAffect');
         this.trigger('rippleDidAffect', this, type);
       }, this));
@@ -325,10 +328,10 @@ App.RipplingMixin = {
   /**
    * TODO doc
    */
-  stopRipple: function(){
+  stopRipple: function(type){
     for (var i = 0; i < this.nodes.length; i += 1) {
       if (this.nodes[i].isAwake) {
-        this.nodes[i].stopRippleEffect();
+        this.nodes[i].stopRippleEffect(type);
       }
     }
     this.currentRipple = undefined;
