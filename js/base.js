@@ -278,7 +278,7 @@ App.BaseNode = Ut.Circle.extend(Ut.extend({
       var cb = _.bind(function(){
             this._stopAnimation('pulse');
             this.unbind('didPulsePeriod', cb);
-            this.trigger('didAnimationStep', this, type); // ?
+            this.trigger('didAnimationStep', this, type, {isEnd:true}); // ?
           }, this);
       this.bind('didPulsePeriod', cb);
     }
@@ -341,7 +341,7 @@ App.RipplingMixin = {
    */
   affectNode: function(node, type){
     this.currentRipple.affectedNodes.push(node.uid);
-    console.log(this.currentRipple.affectedNodes, 'rippleWillAffect');
+    console.logRecord(this.currentRipple.affectedNodes.join(','), Date.now());
     node.bind_('rippleDidAffect', this.afterAffectNode, this);
     node.startRippleEffect(type);
   },
@@ -356,11 +356,17 @@ App.RipplingMixin = {
    * TODO doc
    */
   affectNodeNeighbors: function(node, type){
+    var n = 0;
     this._performOnNodeNeighbors(node, _.bind(function(node_){
       if (this.currentRipple.affectedNodes.indexOf(node_.uid) !== -1) {
-        console.log(node_, 'already affected');
+        // console.log(node_, 'already affected'); 
         return;
       }
+      if (n >= Co.RIPPLE.maxNeighbors) {
+        console.log(node_, 'reached max neighbors'); 
+        return;
+      }
+      n += 1;
       this.affectNode(node_, type);
     }, this));
   }
@@ -429,20 +435,20 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
     this.nodes = [];
     for (var i = 0; i < this.params.num; i += 1) {
       this.nodes[i] = this.onPopulate(i);
-      this.nodes[i].bind_('willDoAnimationStep', function(node, type){
+      this.nodes[i].bind_('willDoAnimationStep', function(node, type, opt){
         if (type === Co.PULSE.SEQUENTIAL) {
-          // console.log('saving');
+          console.log('saving');
           App.context.save();
         } 
       }, this);
-      this.nodes[i].bind_('didAnimationStep', function(node, type){
+      this.nodes[i].bind_('didAnimationStep', function(node, type, opt){ // TODO new convention
         this.draw();
         // this._performOnNodeNeighbors(node, function(node_){
         //   App.canvas.clear(node_);
         //   node_.draw();
         // });
-        if (type === Co.PULSE.SEQUENTIAL) {
-          // console.log('restoring');
+        if (type === Co.PULSE.SEQUENTIAL && (!opt || !opt.isEnd)) {
+          console.log('restoring');
           App.context.restore();
         } 
       }, this);
@@ -543,7 +549,7 @@ App.BaseManager = Ut.Class.extend(Ut.extend(Ut.CanvasEventMixin, {
   _performOnNodeNeighbors: function(node, cb, opt){
     opt = opt || {};
     if (opt.force === true || !node.neighbors) {
-      var mock = Ut.extend({}, node);
+      var mock = Ut.extend({}, node); // TODO change to clone
       mock.rad += 5;
       node.neighbors = _.select(this.nodes, function(node_){
         if (this._nodesIntersect(mock, node) && node_.uid !== node.uid) {

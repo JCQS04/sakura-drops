@@ -64,6 +64,12 @@ App.constants = {
       dir: 1 
     }
   },
+  /**
+   * TODO doc
+   */
+  RIPPLE: {
+    maxNeighbors: 3
+  },
   /** 
    * Constants: passes.
    * @static 
