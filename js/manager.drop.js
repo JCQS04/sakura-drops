@@ -5,7 +5,6 @@
 // ----------------------------------------
 // INTRO
 // ----------------------------------------
-_.namespace(hlfPkg + '.sakuraDrops');
 (function(hlf) {
 var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module, 
     Co = App.constants, Ma = App.Math;
