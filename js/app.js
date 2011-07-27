@@ -2,15 +2,6 @@
  * @fileoverview Inspired by the effects in Sakura Drops.
  * @author peng@pengxwang.com (Peng Wang)
  */
-// TODO - require js sometimes doesn't work
-// if (window.require && 
-//     !window.jQuery || 
-//     !window.Namespace || 
-//     !window.hlf.util || 
-//     !window.hlf.module
-//     ) {
-//     window.location.reload();
-// }
 /**
  * @name hlf.sakuraDrops
  * @namespace Application namespace.
@@ -19,7 +10,32 @@
 // ----------------------------------------
 // INTRO
 // ----------------------------------------
+(function(){
+
+// TODO refine
+require({
+  paths: {
+    'underscore': '../../bin/underscore/underscore',
+    '_namespace': '../../js/underscore.namespace',
+    'backbone': '../../bin/backbone/backbone',
+    'jquery': '../../bin/jquery',
+    'header': '../../js/header',
+    'core': '../../js/hlf.util/core',
+    'math': '../../js/hlf.util/math',
+    'geometry': '../../js/hlf.util/geometry',
+    'console': '../../js/hlf.util/console',
+    'aliases': '../../js/hlf.module/third-party-aliases',
+    'circle-packer': '../../js/hlf.module/circle-packer',
+    'canvas': '../../js/hlf.module/canvas',
+    'canvas-ui': '../../js/hlf.jquery/ui.canvas-app'
+  }
+}, ['order!underscore', 'order!_namespace', 'order!backbone',
+'order!jquery', 'order!header', 'order!core', 'order!math', 'order!geometry',
+'order!console', 'order!aliases', 'order!circle-packer','order!canvas','order!canvas-ui',
+'order!globals', 'order!base', 'order!node.drop', 'order!manager.drop'], function(){
+
 (function(hlf){
+
 var App = hlf.sakuraDrops, Ut = hlf.util, Mod = hlf.module, 
     Co = App.constants, Ma = App.Math;
 /**
@@ -67,3 +83,5 @@ $(function(){
 // OUTRO
 // ----------------------------------------
 })(_.namespace(hlfPkg));
+});
+})();
